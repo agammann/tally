@@ -1,0 +1,44 @@
+{
+  "name": "tally-installation",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=24.0.0 <25",
+    "pnpm": "11.19.0"
+  },
+  "scripts": {
+    "build": "pnpm --filter @tally-local/sdk build && pnpm --filter @tally-local/shared build && pnpm --filter tally-dashboard build && pnpm --filter tally-reference build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "vitest run",
+    "test:browser": "playwright test",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "dev": "pnpm --filter tally-dashboard dev",
+    "reference": "pnpm --filter tally-reference dev",
+    "init": "tsx scripts/init.ts",
+    "owner:recover": "tsx scripts/recover.ts",
+    "retention": "tsx scripts/retention.ts",
+    "test:integration": "tsx scripts/integration.ts",
+    "test:operations": "tsx scripts/operations.ts",
+    "test:independent": "tsx scripts/independent.ts",
+    "licenses": "tsx scripts/licenses.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "6.19.3",
+    "better-auth": "1.7.3",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "prisma": "6.19.3",
+    "tsx": "^4.21.0",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.11"
+  }
+}

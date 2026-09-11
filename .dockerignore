@@ -1,0 +1,12 @@
+node_modules
+**/node_modules
+**/.next
+**/dist
+**/.env*
+.git
+work
+artifacts
+backups
+test-results
+playwright-report
+*.tgz

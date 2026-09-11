@@ -1,0 +1,55 @@
+name: Verify Tally
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --global pnpm@11.19.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run init
+      - run: docker compose up -d --wait db
+      - run: pnpm db:generate && pnpm db:migrate && pnpm build
+      - run: pnpm exec tsc --noEmit && pnpm test && pnpm audit --prod
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Start private production services
+        run: |
+          mkdir -p work
+          pnpm --filter tally-dashboard start > work/dashboard-server.log 2>&1 &
+          pnpm --filter tally-reference start > work/reference-server.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://localhost:3000/api/ready; then break; fi
+            sleep 1
+          done
+      - run: pnpm test:browser
+      - run: pnpm test:integration && pnpm test:independent && pnpm test:operations
+      - run: pnpm exec tsx scripts/native-check.ts
+      - run: pnpm exec tsx scripts/workflow-boundary.ts && pnpm exec tsx scripts/recovery-check.ts
+      - run: pnpm exec tsx scripts/performance.ts
+      - run: pnpm run licenses
+      - name: Build container
+        run: docker compose build app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tally-sdk-and-verification
+          path: |
+            artifacts/*.tgz
+            work/integration-results.json
+            work/independent-results.json
+            work/operations-results.json
+            work/native-results.json
+            work/workflow-boundary-results.json
+            work/recovery-results.json
+            docs/PERFORMANCE.json
+            docs/DEPENDENCIES.json
+      - if: always()
+        run: docker compose --profile app down

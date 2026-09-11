@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-09-09T05:31:38.478Z",
+  "environment": {
+    "os": "win32 10.0.26200",
+    "node": "v24.19.0",
+    "cpu": "AMD Ryzen 7 7840HS w/ Radeon 780M Graphics     ",
+    "logicalCpus": 16,
+    "hostMemoryGiB": 15,
+    "database": "PostgreSQL 17.9 Docker, 768MiB limit",
+    "application": "Next.js production server, localhost"
+  },
+  "workload": {
+    "events": 5000,
+    "invocations": 2500,
+    "batchSize": 50,
+    "concurrency": 5,
+    "requests": 100,
+    "reportQueries": 10
+  },
+  "ingestion": {
+    "totalMs": 4601,
+    "eventsPerSecond": 1087,
+    "medianMs": 148,
+    "p95Ms": 240,
+    "maxMs": 309
+  },
+  "reports": {
+    "medianMs": 217,
+    "p95Ms": 285,
+    "maxMs": 285
+  },
+  "limits": "One local workload; not a scalability guarantee. Current report service rejects projects above 50,000 retained events."
+}

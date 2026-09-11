@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-09-11T01:43:22.848Z",
+  "results": [
+    "owner login issues session cookie",
+    "out-of-order and 10 concurrent duplicate batches persist once",
+    "persisted 10-start fixture produces 75%, median 450ms, p95 800ms",
+    "ingestion IDs cannot read; unauthenticated and cross-origin owner actions rejected",
+    "strict schema, version, bytes, batch, origin, cardinality and late-arrival rejection",
+    "conflicting terminal excluded; terminal-only record remains missing a start",
+    "database-backed daily quota and request rate limit enforced",
+    "identifier rotation revokes old writes and preserves data",
+    "authenticated bounded JSON export",
+    "confirmed project deletion and dependent data cascade",
+    "expired sessions rejected",
+    "public registration disabled",
+    "sixth login attempt per minute rejected"
+  ]
+}

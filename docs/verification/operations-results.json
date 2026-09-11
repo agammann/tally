@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-09-11T01:44:06.596Z",
+  "results": [
+    "database restart preserved 92 events",
+    "binary backup restored into separate disposable database with matching row counts",
+    "additive upgrade from initial schema preserved representative existing project and invocation",
+    "retention removes complete expired invocation, including recent duplicate terminal, leaving no derived data",
+    "disposable restore and upgrade databases removed"
+  ]
+}

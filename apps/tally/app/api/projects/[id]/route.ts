@@ -1,0 +1,7 @@
+import {randomUUID} from 'node:crypto';
+import {projectSchema} from '@tally-local/shared';
+import {z} from 'zod';
+import {db} from '../../../../lib/db';
+import {authorizeProject,sameOrigin,HttpError} from '../../../../lib/auth';
+import {boundedJson,fail,json} from '../../../../lib/http';
+export async function POST(req:Request,ctx:{params:Promise<{id:string}>}){try{sameOrigin(req);const {id}=await ctx.params;const p=await authorizeProject(req.headers,id);const b=z.discriminatedUnion('action',[z.object({action:z.literal('rotate')}).strict(),z.object({action:z.literal('delete'),confirm:z.string()}).strict(),z.object({action:z.literal('update'),settings:projectSchema}).strict()]).safeParse(await boundedJson(req,16384));if(!b.success)throw new HttpError(400,'Invalid action');const body=b.data;return json(await db.$transaction(async tx=>{await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${id},0))`;if(body.action==='delete'){if(body.confirm!==p.name)throw new HttpError(400,'Confirm the project name');await tx.project.delete({where:{id}});return {deleted:true};}if(body.action==='rotate')return tx.project.update({where:{id},data:{ingestionId:randomUUID()}});if(body.settings.workflowName!==p.workflowName)throw new HttpError(400,'Workflow name is immutable; create a new project for a new definition');return tx.project.update({where:{id},data:body.settings});}));}catch(e){return fail(e);}}

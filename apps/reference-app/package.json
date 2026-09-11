@@ -1,0 +1,20 @@
+{
+  "name": "tally-reference",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3001 --hostname 127.0.0.1",
+    "build": "next build --webpack",
+    "start": "next start --port 3001 --hostname 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "start:container": "next start --port 3001 --hostname 0.0.0.0"
+  },
+  "dependencies": {
+    "@tally-local/sdk": "workspace:*",
+    "@tally-local/shared": "workspace:*",
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "4.5.4"
+  }
+}

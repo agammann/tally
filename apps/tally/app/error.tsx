@@ -1,0 +1,1 @@
+'use client';export default function ErrorPage({reset}:{reset:()=>void}){return <main className="auth"><h1>Tally is unavailable</h1><p>Check the database and application readiness, then try again.</p><button onClick={reset}>Try again</button></main>;}

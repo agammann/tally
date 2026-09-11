@@ -1,0 +1,9 @@
+{
+  "checkedAt": "2026-09-11T01:38:10.156Z",
+  "events": 50000,
+  "workflows": 25000,
+  "invocations": 25000,
+  "returnedWorkflows": 100,
+  "elapsedMs": 468,
+  "method": "Single-pass workflow index; detail sorting only after selecting 100 timelines. No hardware-dependent timing assertion."
+}

@@ -1,0 +1,1 @@
+{"name":"@tally-local/shared","version":"1.0.0","private":true,"type":"module","exports":{".":"./src/index.ts"},"scripts":{"build":"tsup src/index.ts --format esm --dts","typecheck":"tsc --noEmit"},"dependencies":{"zod":"4.5.4"}}

@@ -1,0 +1,17 @@
+{
+  "runtime": "Docker production app and PostgreSQL",
+  "checks": [
+    "Clean first-owner bootstrap",
+    "Owner login",
+    "Project creation",
+    "Actual reference ingestion and failure inspection",
+    "Durable simulated checkout",
+    "Slow and cancelled callbacks",
+    "Release and workflow reports",
+    "Mobile layout without document overflow"
+  ],
+  "containerReady": true,
+  "durationSeconds": 7.7,
+  "result": "passed",
+  "checkedAt": "2026-09-11T01:49:28.4546654Z"
+}

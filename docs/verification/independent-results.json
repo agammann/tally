@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-09-11T01:43:37.986Z",
+  "archive": "tally-local-sdk-0.1.0.tgz",
+  "checks": [
+    "Archive installed outside workspace graph",
+    "TypeScript declarations compiled",
+    "ESM consumer callback ran once",
+    "Real HTTP ingestion accepted"
+  ],
+  "output": "Independent ESM archive import, real ingestion, and callback preservation passed"
+}
