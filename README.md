@@ -27,7 +27,7 @@ pnpm run init
 docker compose --profile app up --build -d
 ```
 
-Open **http://localhost:3000**. Read `SETUP_TOKEN` from the generated `.env` locally, enter it in first-owner setup, and choose your own email and password. There are no production default credentials. Keep `.env` private; it contains the database password, authentication secret, and bootstrap token. `pnpm run init` never overwrites an existing `.env`.
+Open `http://localhost:3000` after starting your local installation. Read `SETUP_TOKEN` from the generated `.env` locally, enter it in first-owner setup, and choose your own email and password. There are no production default credentials. Keep `.env` private; it contains the database password, authentication secret, and bootstrap token. `pnpm run init` never overwrites an existing `.env`.
 
 Create a project in **Setup**. Enter the allowed browser origins and exact tool/environment/release/error labels. The browser ingestion identifier is public and grants write-only access; your owner session is required to view reports, export, rotate identifiers, change settings, or delete data.
 
@@ -66,7 +66,7 @@ The archive contains ESM, CommonJS and TypeScript declarations, with **no runtim
 pnpm reference
 ```
 
-Open http://localhost:3001. In Tally, create a separate project named Reference storefront using the prefilled reference allowlists and origin `http://localhost:3001`. Copy its public ingestion identifier to the storefront and connect. Run the manual test buttons, ordinary product controls, or native tools where supported. Use **v1 + delivery failure**, then **v2 + the same scenario** to observe the corrected release. Use the slow and cancellation scenarios to inspect latency and outcome handling. Saving a simulated order persists it to this browser before recording workflow completion; it does not process a payment.
+Open `http://localhost:3001` after starting the local reference storefront. In Tally, create a separate project named Reference storefront using the prefilled reference allowlists and origin `http://localhost:3001`. Copy its public ingestion identifier to the storefront and connect. Run the manual test buttons, ordinary product controls, or native tools where supported. Use **v1 + delivery failure**, then **v2 + the same scenario** to observe the corrected release. Use the slow and cancellation scenarios to inspect latency and outcome handling. Saving a simulated order persists it to this browser before recording workflow completion; it does not process a payment.
 
 Manual tests, ordinary application controls and native callbacks have distinct application-reported source labels. Support detection alone is never proof of a native execution. See [compatibility](docs/COMPATIBILITY.md).
 
