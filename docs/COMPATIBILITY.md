@@ -3,11 +3,11 @@
 Checked **2026-09-08 (America/Los_Angeles)** against the live official sources:
 
 - [webmachinelearning/webmcp repository and explainer](https://github.com/webmachinelearning/webmcp)
-- [Editorâ€™s draft specification](https://webmachinelearning.github.io/webmcp/)
+- [Editor’s draft specification](https://webmachinelearning.github.io/webmcp/)
 - [Chrome implementation guide](https://developer.chrome.com/docs/ai/webmcp), last updated 2026-08-07
 - [Chrome imperative API guide](https://developer.chrome.com/docs/ai/webmcp/imperative-api)
 
-The current explainer uses `document.modelContext.registerTool`, with a registration AbortSignal for cleanup. The draft invokes the imperative callback with `(input, {signal})`. Results are serialized from the callbackâ€™s fulfillment value; rejected promises signal execution failure. Browser cancellation can reject the caller while the page callback continues or races with completion. Tally records only the callback outcome it actually observes. Tally's optional `{isError:true}` convention is **application result classification**, not a claim that the current draft standardizes that property.
+The current explainer uses `document.modelContext.registerTool`, with a registration AbortSignal for cleanup. The draft invokes the imperative callback with `(input, {signal})`. Results are serialized from the callback’s fulfillment value; rejected promises signal execution failure. Browser cancellation can reject the caller while the page callback continues or races with completion. Tally records only the callback outcome it actually observes. Tally's optional `{isError:true}` convention is **application result classification**, not a claim that the current draft standardizes that property.
 
 Chrome documents an origin trial from version 149 and a local testing flag at `chrome://flags/#enable-webmcp-testing`, requiring relaunch. WebMCP is origin-isolation and `tools` permissions-policy gated. APIs can change; supported detection is runtime capability detection, not version sniffing. No extension or AI key is required by Tally.
 
