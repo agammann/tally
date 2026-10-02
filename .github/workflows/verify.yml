@@ -21,23 +21,27 @@ jobs:
       - run: pnpm db:generate && pnpm db:migrate && pnpm build
       - run: pnpm exec tsc --noEmit && pnpm test && pnpm audit --prod
       - run: pnpm exec playwright install --with-deps chromium
-      - name: Start private production services
+      - name: Start containerized dashboard and production reference
         run: |
+          docker compose build app
+          docker compose --profile app up -d --wait app
           mkdir -p work
-          pnpm --filter tally-dashboard start > work/dashboard-server.log 2>&1 &
           pnpm --filter tally-reference start > work/reference-server.log 2>&1 &
+          ready=false
           for attempt in $(seq 1 30); do
-            if curl --fail --silent http://localhost:3000/api/ready; then break; fi
+            if curl --fail --silent http://localhost:3001/ > /dev/null; then ready=true; break; fi
             sleep 1
           done
+          test "$ready" = true
       - run: pnpm test:browser
       - run: pnpm test:integration && pnpm test:independent && pnpm test:operations
-      - run: pnpm exec tsx scripts/native-check.ts
+      - name: Require real native WebMCP checks
+        env:
+          TALLY_REQUIRE_NATIVE: '1'
+        run: pnpm exec tsx scripts/native-check.ts
       - run: pnpm exec tsx scripts/workflow-boundary.ts && pnpm exec tsx scripts/recovery-check.ts
       - run: pnpm exec tsx scripts/performance.ts
       - run: pnpm run licenses
-      - name: Build container
-        run: docker compose build app
       - uses: actions/upload-artifact@v4
         with:
           name: tally-sdk-and-verification
