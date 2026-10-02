@@ -5,8 +5,9 @@ export function nativeContext():Context|undefined {return typeof document==='und
 export async function registerTools(tools:BrowserTool[],signal:AbortSignal):Promise<string>{
  const ctx=nativeContext();if(!ctx?.registerTool)return 'Native WebMCP unavailable. Ordinary controls and labeled manual tests remain available.';
  const registered:string[]=[];
- const cleanup=()=>{for(const name of registered){try{ctx.unregisterTool?.(name);}catch{ /* old implementation cleanup is best effort */ }}};
+ const registration=new AbortController();
+ const cleanup=()=>{registration.abort();signal.removeEventListener('abort',cleanup);for(const name of registered){try{ctx.unregisterTool?.(name);}catch{ /* old implementation cleanup is best effort */ }}};
  signal.addEventListener('abort',cleanup,{once:true});
- try{for(const tool of tools){if(signal.aborted)break;await ctx.registerTool(tool,{signal});registered.push(tool.name);}if(signal.aborted){cleanup();return 'Native registration stopped.';}return 'Native WebMCP registered. Execution source and outcomes are application-reported.';}
- catch {cleanup();return 'Native WebMCP registration failed. Use ordinary controls or labeled manual tests.';}
+ try{for(const tool of tools){if(signal.aborted)break;await ctx.registerTool(tool,{signal:registration.signal});registered.push(tool.name);}if(signal.aborted){cleanup();return 'Native registration stopped.';}return 'Native WebMCP registered. Execution source and outcomes are application-reported.';}
+ catch {cleanup();return signal.aborted?'Native registration stopped.':'Native WebMCP registration failed. Use ordinary controls or labeled manual tests.';}
 }

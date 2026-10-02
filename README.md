@@ -72,12 +72,13 @@ Manual tests, ordinary application controls and native callbacks have distinct a
 
 ## Verify
 
-Use a **disposable local installation** for the verification scripts. The browser suite creates its own random QA owner credential in ignored `work/qa-state.json`. It must never run against an installation with a real owner. Run the dashboard and reference application first.
+Use a **disposable local installation** for the verification scripts. The browser suite creates its own random QA owner credential in ignored `work/qa-state.json`. It must never run against an installation with a real owner. Complete installation and database migration above first. Generate the Prisma client and build the workspace packages before typechecking a fresh checkout; then run the dashboard and reference application for the browser and integration checks.
 
 ```sh
+pnpm db:generate
+pnpm build
 pnpm exec tsc --noEmit
 pnpm test
-pnpm build
 pnpm exec playwright install chromium
 pnpm test:browser
 pnpm test:integration
@@ -89,6 +90,8 @@ pnpm audit --prod
 ```
 
 The operations test restarts this Compose database and creates/removes only the named disposable `tally_restore_check` and `tally_upgrade_check` databases. The integration test creates verification projects, manipulates their limit counters, expires verification sessions, and tests the owner login limiter. Do not run these tests on a live installation.
+
+CI sets `TALLY_REQUIRE_NATIVE=1` for the native check, so missing browser capabilities fail that job. An ordinary local run records unsupported native APIs as unverified. Native checks exercise the browser's tool discovery and execution APIs, unauthorized project rejection, visible filter changes, persisted outcomes, and removal of tools after sign-out.
 
 ## Documentation
 
