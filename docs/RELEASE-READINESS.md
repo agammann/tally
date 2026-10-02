@@ -2,6 +2,8 @@
 
 Assessment completed September 10, 2026, America/Los_Angeles. Machine evidence uses UTC, including September 11 timestamps.
 
+The hosted service's October 2, 2026 native dashboard checks are documented separately in [compatibility](COMPATIBILITY.md#hosted-dashboard-verification), with [compact results](verification/hosted-native-results.json). The assessment below covers the self-hosted edition.
+
 **Evidence supports a first release for small private installations.** The SDK, collector, dashboard and reference application work with real persisted telemetry. Broader commercial distribution needs a license decision, dependency obligation review, deployment specific HTTPS and access controls, and capacity validation for the intended workload. No paid service or AI API key is required.
 
 ## Implemented
@@ -41,7 +43,7 @@ After the security correction, a separate boundary fixture calculated 25,000 wor
 
 1. Reports reject projects with more than 50,000 retained events, even for a short requested period. They return an explicit 422 instead of silently truncating aggregate data. Daily ingestion quota defaults to 100,000 and does not raise this report ceiling. Set quotas and retention for a small private workload; increasing scale requires a different query/aggregation strategy.
 2. Telemetry is best effort. Queue overflow, unload, network failures and exhausted retries can lose events. The SDK does not promise lossless delivery, browser storage persistence or exactly once transport.
-3. Native support is verified only for the documented flagged Chromium version. No claim covers unwrapped callbacks, declarative forms, rejection before callback entry, other browsers or automatic provider attribution. See [compatibility](COMPATIBILITY.md).
+3. This self-hosted native assessment covers the documented flagged Chromium 153 version. No claim covers unwrapped callbacks, declarative forms, rejection before callback entry, other browsers or automatic provider attribution. The separate hosted Chrome 154 check is recorded in [compatibility](COMPATIBILITY.md).
 4. SDK 0.1.0 preserves ordinary synchronous values and native Promise outcomes. It does not treat custom thenables as promises. Promise object identity is not preserved.
 5. One owner, up to 20 projects, one named workflow per project, immutable workflow definition and 30 minute observation window. New workflows remain open until the window matures, including those already completed early.
 6. Remote HTTPS, secure host access, Windows file ACLs, backup encryption/expiration and retention scheduling are operator responsibilities. These checks cover the self-hosted PostgreSQL edition. The hosted D1 service linked from the README is a separately maintained Sites deployment; this historical assessment does not certify it. The container favors a reproducible source build and includes build dependencies; its measured local image is approximately 4 GB.

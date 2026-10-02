@@ -6,6 +6,8 @@
 
 Sign in with ChatGPT to create your own projects and view telemetry in the hosted service. Follow the [hosted integration guide](https://tally.alx21.chatgpt.site/guide) to connect your application.
 
+The hosted dashboard's three native WebMCP read tools were verified in Chrome 154 on October 2, 2026. See the [tested browser, results and scope](docs/COMPATIBILITY.md#hosted-dashboard-verification).
+
 This repository contains the TypeScript SDK and the self-hosted edition described below.
 
 Tally is a private, self-hosted monitor for explicitly instrumented WebMCP execution callbacks. Install the TypeScript SDK, execute tools in your own application, then inspect observed outcomes, latency, workflow completion, and release differences in the authenticated dashboard.

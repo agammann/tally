@@ -11,7 +11,7 @@ The current explainer uses `document.modelContext.registerTool`, with a registra
 
 Chrome documents an origin trial from version 149 and a local testing flag at `chrome://flags/#enable-webmcp-testing`, requiring relaunch. WebMCP is origin-isolation and `tools` permissions-policy gated. APIs can change; supported detection is runtime capability detection, not version sniffing. No extension or AI key is required by Tally.
 
-## Supported adapter surface
+## Self-hosted adapter surface
 
 `packages/shared/src/webmcp.ts` owns browser registration. It feature-detects `document.modelContext.registerTool`, passes registration cancellation, and uses `unregisterTool(name)` only when an implementation provides that older cleanup method. It never monkey-patches the browser or makes the presence of an API a proof of execution. Failed registration cleans up registered names where supported and leaves ordinary UI working. No old `navigator.modelContext` registration fallback is silently treated as draft compatibility.
 
@@ -19,7 +19,15 @@ The authenticated dashboard registers `get_tool_metrics`, `get_tool_failures`, a
 
 The storefront registers `search_products`, `check_delivery`, and `add_to_cart`. Their native wrapper path explicitly sets `webmcp`; ordinary controls use `application` and manual diagnostic buttons use `manual`. Its checkout persists the fictional order before recording completion. Native caller identity and business correctness are not independently verified.
 
-## Verification paths
+## Hosted dashboard verification
+
+On October 2, 2026, the signed-in [hosted dashboard](https://tally.alx21.chatgpt.site/dashboard) passed native checks in **Google Chrome 154.0.8037.98 on Windows**, with WebMCP testing enabled and **WebMCP - Model Context Tool Inspector 1.9.18**. The inspector's Execute Tool controls invoked the browser's native tools; no model API key was used.
+
+The hosted tools are `get_tally_summary`, `get_workflow_completion`, and `list_tool_failures`. Each accepts `{}` and reads the current project and visible filters. Together, their results matched the expected stored observations: six calls, four successes, one failure, one cancellation, and an 80% success rate; one completed workflow after its real 30-minute window; and one `CHECKOUT_UNAVAILABLE` failure. Selecting the visible `manual` source filter returned two successful calls at 100%; clearing it restored the original summary.
+
+All three rejected an unexpected argument. Navigating to the integration guide removed the registrations; returning to the dashboard restored all three, and a fresh summary call matched the original. See the [compact hosted evidence](verification/hosted-native-results.json). This check covers the hosted read tools. It did not capture console errors or evaluate other browser-agent products.
+
+## Self-hosted verification paths
 
 Verified again September 10, 2026 in Playwright Chromium **153.0.8010.12**, with `--enable-features=WebMCPTesting`. The implementation accepts JSON encoded string arguments in `executeTool`, consistent with Chrome's imperative guide; older explainer examples using an object are not interchangeable with this tested implementation.
 

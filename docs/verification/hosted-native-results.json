@@ -1,0 +1,102 @@
+{
+  "recordedAt": "2026-10-02T22:26:31.753336+00:00",
+  "status": "passed",
+  "target": "https://tally.alx21.chatgpt.site/dashboard",
+  "browser": "Google Chrome 154.0.8037.98 on Windows",
+  "nativeTestingEnabled": true,
+  "client": {
+    "name": "WebMCP - Model Context Tool Inspector",
+    "version": "1.9.18",
+    "mode": "Manual Execute Tool controls",
+    "modelApiKeyUsed": false
+  },
+  "tools": [
+    "get_tally_summary",
+    "get_workflow_completion",
+    "list_tool_failures"
+  ],
+  "sharedInputSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "readOnlyHint": true,
+  "period": {
+    "from": "2026-09-26T00:00:00.000Z",
+    "to": "2026-10-03T00:00:00.000Z",
+    "timezone": "UTC"
+  },
+  "summary": {
+    "callsStarted": 6,
+    "success": 4,
+    "failure": 1,
+    "cancellation": 1,
+    "incomplete": 0,
+    "unknown": 0,
+    "conflicted": 0,
+    "successRate": 0.8,
+    "medianMs": 0.09749999999999659,
+    "p95Ms": 0.19999999552965164,
+    "latencySamples": 5
+  },
+  "manualSourceSummary": {
+    "callsStarted": 2,
+    "success": 2,
+    "failure": 0,
+    "cancellation": 0,
+    "incomplete": 0,
+    "unknown": 0,
+    "conflicted": 0,
+    "successRate": 1,
+    "medianMs": 0.14999999850988388,
+    "p95Ms": 0.19999999552965164,
+    "latencySamples": 2
+  },
+  "failures": [
+    {
+      "group": "submit_checkout / CHECKOUT_UNAVAILABLE",
+      "count": 1
+    }
+  ],
+  "workflow": {
+    "matured": 1,
+    "completed": 1,
+    "rate": 1,
+    "open": 0,
+    "missingCompletion": 0,
+    "missingStarts": 0,
+    "conflicted": 0
+  },
+  "workflowWindowMs": 1800000,
+  "workflowStartedAt": "2026-10-02T20:58:34.420Z",
+  "workflowExecutionOutcomes": [
+    "success",
+    "failure",
+    "cancellation",
+    "success"
+  ],
+  "unexpectedArgumentInvocations": {
+    "input": {
+      "unexpected": true
+    },
+    "failedTools": [
+      "get_tally_summary",
+      "get_workflow_completion",
+      "list_tool_failures"
+    ]
+  },
+  "visibleManualFilterParity": true,
+  "filterResetRestoredOriginalSummary": true,
+  "guideRegisteredTools": [],
+  "dashboardReturnRegisteredTools": [
+    "get_tally_summary",
+    "get_workflow_completion",
+    "list_tool_failures"
+  ],
+  "summaryAfterReturnMatchesOriginal": true,
+  "limits": [
+    "Hosted read-tool verification with fictional telemetry; separate evidence covers the self-hosted edition and reference storefront.",
+    "Page console was not captured; this record makes no assertion about absence of runtime errors.",
+    "Other browser-agent products were not evaluated in this check."
+  ]
+}
