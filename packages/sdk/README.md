@@ -1,6 +1,6 @@
 # @tally-local/sdk 0.1.0
 
-Dependency-free TypeScript instrumentation for explicitly wrapped WebMCP callbacks. Sends Tally schema v1 metadata to a private collector. ESM, CommonJS and declaration files are included. The scope is provisional and no license grant is selected.
+Dependency-free TypeScript instrumentation for explicitly wrapped WebMCP callbacks. Sends Tally schema v1 metadata to a private collector. ESM, CommonJS and declaration files are included. The scope is provisional. Licensed under the [MIT License](LICENSE).
 
 ```ts
 import { createTallyClient } from '@tally-local/sdk';

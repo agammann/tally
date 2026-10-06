@@ -14,7 +14,7 @@ Tally is a private, self-hosted monitor for explicitly instrumented WebMCP execu
 
 This is a software product, not a contest submission. It runs without a paid service or AI API key. The fictional Field Supply storefront is an integration reference with real telemetry ingestion and simulated orders; it is not the only application the SDK supports.
 
-**Release status:** See [the executed-check report](docs/RELEASE-READINESS.md) before relying on this release. Native integration status, capacity limits, licensing decisions, and remaining limitations are explicit there. The local npm scope `@tally-local` is provisional; no package has been published and availability of the name is not claimed. No license grant has been selected.
+**Release status:** See [the executed-check report](docs/RELEASE-READINESS.md) before relying on this release. Native integration status, capacity limits, dependency license obligations, and remaining limitations are explicit there. The local npm scope `@tally-local` is provisional; no package has been published and availability of the name is not claimed. Tally is licensed under the [MIT License](LICENSE).
 
 ![Tally dashboard showing real reference tool observations](docs/assets/dashboard-desktop.png)
 

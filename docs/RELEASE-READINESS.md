@@ -2,9 +2,11 @@
 
 Assessment completed September 10, 2026, America/Los_Angeles. Machine evidence uses UTC, including September 11 timestamps.
 
+Licensing update October 5, 2026: project source and SDK are released under the [MIT License](../LICENSE). The executed checks below retain their original assessment dates.
+
 The hosted service's October 2, 2026 native dashboard checks are documented separately in [compatibility](COMPATIBILITY.md#hosted-dashboard-verification), with [compact results](verification/hosted-native-results.json). The assessment below covers the self-hosted edition.
 
-**Evidence supports a first release for small private installations.** The SDK, collector, dashboard and reference application work with real persisted telemetry. Broader commercial distribution needs a license decision, dependency obligation review, deployment specific HTTPS and access controls, and capacity validation for the intended workload. No paid service or AI API key is required.
+**Evidence supports a first release for small private installations.** The SDK, collector, dashboard and reference application work with real persisted telemetry. Broader commercial distribution needs dependency obligation review, deployment specific HTTPS and access controls, and capacity validation for the intended workload. No paid service or AI API key is required.
 
 ## Implemented
 
@@ -47,7 +49,7 @@ After the security correction, a separate boundary fixture calculated 25,000 wor
 4. SDK 0.1.0 preserves ordinary synchronous values and native Promise outcomes. It does not treat custom thenables as promises. Promise object identity is not preserved.
 5. One owner, up to 20 projects, one named workflow per project, immutable workflow definition and 30 minute observation window. New workflows remain open until the window matures, including those already completed early.
 6. Remote HTTPS, secure host access, Windows file ACLs, backup encryption/expiration and retention scheduling are operator responsibilities. These checks cover the self-hosted PostgreSQL edition. The hosted D1 service linked from the README is a separately maintained Sites deployment; this historical assessment does not certify it. The container favors a reproducible source build and includes build dependencies; its measured local image is approximately 4 GB.
-7. Package namespace and product naming rights have not been established. `@tally-local/sdk` is a provisional local archive name. No npm publication or software license grant has been made.
+7. Package namespace and product naming rights have not been established. `@tally-local/sdk` is a provisional local archive name. No npm publication has been made. Source and SDK are licensed under the [MIT License](../LICENSE).
 8. [DEPENDENCIES.json](DEPENDENCIES.json) inspected 222 installed package manifest license fields. Flagged families include LGPL in a Sharp native package, MPL in Lightning CSS, CC BY in caniuse data and composite license expressions. These need distribution specific review and appropriate notices/source obligations before commercial redistribution. No legal clearance is claimed.
 9. CI configuration is supplied. Local execution evidence above is distinct from a GitHub Actions run. Consult the repository Actions page for the result on a particular public commit.
 
