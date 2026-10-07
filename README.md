@@ -14,13 +14,15 @@ Tally is a private, self-hosted monitor for explicitly instrumented WebMCP execu
 
 This is a software product, not a contest submission. It runs without a paid service or AI API key. The fictional Field Supply storefront is an integration reference with real telemetry ingestion and simulated orders; it is not the only application the SDK supports.
 
-**Release status:** See [the executed-check report](docs/RELEASE-READINESS.md) before relying on this release. Native integration status, capacity limits, dependency license obligations, and remaining limitations are explicit there. The local npm scope `@tally-local` is provisional; no package has been published and availability of the name is not claimed. Tally is licensed under the [MIT License](LICENSE).
+**Version 1.0:** The supported scope is one owner, up to 20 projects, and reports over at most 50,000 retained events per project. Read the [v1 stability and upgrade contract](docs/V1.md) and [executed-check report](docs/RELEASE-READINESS.md). The local npm scope `@tally-local` is provisional; no registry package has been published and availability of the name is not claimed. Tally is licensed under the [MIT License](LICENSE).
 
 ![Tally dashboard showing real reference tool observations](docs/assets/dashboard-desktop.png)
 
 ## Start a private installation
 
 Requirements: Node.js 24 LTS, **pnpm 11.19.0**, Docker with Compose v2. Ports 3000, 3001 (optional storefront), and 55487 (local PostgreSQL) must be free. These commands work from a checked-out source directory in PowerShell or a POSIX shell.
+
+Download and extract **Source code (zip)** or **Source code (tar.gz)** from the [v1.0.0 release](https://github.com/agammann/tally/releases/tag/v1.0.0), then open a terminal in the extracted directory. The tagged source includes the application, migrations, SDK, MIT license, and operations documentation. The release publishes only after the complete verification job passes; a release asset is not a prebuilt application container.
 
 ```sh
 npm install --global pnpm@11.19.0
@@ -47,20 +49,26 @@ The initialization command copies local server settings into `apps/tally/.env.lo
 
 ## Install the SDK in another application
 
-Build a distributable archive from this repository:
+Download `tally-local-sdk-1.0.0.tgz` and its `.sha256` file from the [v1.0.0 release](https://github.com/agammann/tally/releases/tag/v1.0.0). Compare the archive's SHA256 against the checksum before installation:
+
+```powershell
+Get-FileHash ./tally-local-sdk-1.0.0.tgz -Algorithm SHA256
+```
+
+On Linux use `sha256sum`, or on macOS use `shasum -a 256`. You can also build the same distributable format from a checked-out release:
 
 ```sh
 pnpm --filter @tally-local/sdk build
-pnpm --filter @tally-local/sdk pack --pack-destination ../../artifacts
+pnpm --filter @tally-local/sdk pack --pack-destination artifacts
 ```
 
-Copy `artifacts/tally-local-sdk-0.1.0.tgz` to an independent application and run:
+Copy the downloaded archive, or `artifacts/tally-local-sdk-1.0.0.tgz` from your source build, to an independent application and run:
 
 ```sh
-npm install ./tally-local-sdk-0.1.0.tgz
+npm install ./tally-local-sdk-1.0.0.tgz
 ```
 
-The archive contains ESM, CommonJS and TypeScript declarations, with **no runtime dependencies or monorepo imports**. Use the copyable project-specific example in Setup and the [integration guide](docs/INTEGRATION.md). SDK version **0.1.0** sends event schema **1**; the versions are independent.
+The archive contains ESM, CommonJS and TypeScript declarations, with **no runtime dependencies or monorepo imports**. Use the copyable project-specific example in Setup and the [integration guide](docs/INTEGRATION.md). SDK version **1.0.0** sends event schema **1**; the versions are independent.
 
 ## Reference storefront
 
@@ -103,6 +111,7 @@ CI sets `TALLY_REQUIRE_NATIVE=1` for the native check, so missing browser capabi
 - [WebMCP compatibility and native verification](docs/COMPATIBILITY.md)
 - [Operation, backup, retention, upgrade and owner recovery](docs/OPERATIONS.md)
 - [Executed checks and release readiness](docs/RELEASE-READINESS.md)
+- [v1 stability and upgrades](docs/V1.md)
 - [Implementation checklist and decisions](docs/IMPLEMENTATION.md)
 - [Dependency license inventory](docs/DEPENDENCIES.json)
 - [Changelog](CHANGELOG.md)

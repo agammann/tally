@@ -1,4 +1,4 @@
-# @tally-local/sdk 0.1.0
+# @tally-local/sdk 1.0.0
 
 Dependency-free TypeScript instrumentation for explicitly wrapped WebMCP callbacks. Sends Tally schema v1 metadata to a private collector. ESM, CommonJS and declaration files are included. The scope is provisional. Licensed under the [MIT License](LICENSE).
 
@@ -17,4 +17,4 @@ const wrapped = tally.wrapTool(yourToolDefinition, {source: 'webmcp'});
 
 Best-effort telemetry, bounded queue/retries/request deadlines, no global patching, no argument/result/error-message collection. Default queue 200, batch 25, timeout 2 seconds, retries 2, interval 5 seconds. Overflow drops oldest. Disabling discards queued data; sent data is not retracted. Cancellation is observed only on a rejected/thrown AbortError. Application-reported source and outcomes are not independent verification.
 
-Full integration, result-classification, privacy, compatibility and operations documentation ships with the Tally repository at https://github.com/agammann/tally/tree/main/docs.
+Full integration, result-classification, privacy, compatibility and operations documentation ships with the matching Tally release at https://github.com/agammann/tally/tree/v1.0.0/docs.

@@ -96,7 +96,7 @@ The recovery command delegates hashing to Better Auth, changes the existing owne
 3. Obtain the target source, run `pnpm install --frozen-lockfile`, then build the target container.
 4. Run the explicit migration service: `docker compose --profile app run --rm migrate`.
 5. Start the application: `docker compose --profile app up -d app`. Verify readiness, login, project access and known report samples.
-6. Update SDK archives in applications independently. SDK 0.1.0 remains schema 1; unsupported event schemas receive permanent 400 responses.
+6. Update SDK archives in applications independently. SDK 1.0.0 remains schema 1; unsupported event schemas receive permanent 400 responses.
 
 The initial-to-second migration adds only an index and was tested with existing records. It does not require application code changes and the previous schema-compatible application can read the upgraded database. **No destructive down-migration or general migration rollback is verified.** If a future migration is incompatible, recover a verified backup into a new database and run the matching application revision; later accepted events are absent from that backup. Do not blindly run `migrate reset` or modify an applied migration.
 

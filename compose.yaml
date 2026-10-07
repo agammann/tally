@@ -16,7 +16,7 @@ services:
     mem_limit: 768m
     restart: unless-stopped
   migrate:
-    image: tally-private-app:0.1.0
+    image: tally-private-app:1.0.0
     build: .
     env_file: .env
     environment:
@@ -26,7 +26,7 @@ services:
       db: {condition: service_healthy}
     profiles: [app]
   app:
-    image: tally-private-app:0.1.0
+    image: tally-private-app:1.0.0
     build: .
     env_file: .env
     environment:
