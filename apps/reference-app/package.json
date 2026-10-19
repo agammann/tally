@@ -14,7 +14,7 @@
     "@tally-local/sdk": "workspace:*",
     "@tally-local/shared": "workspace:*",
     "next": "16.3.8",
-    "react": "19.2.8",
+    "react": "19.3.1",
     "react-dom": "19.2.8",
     "zod": "4.5.4"
   }
