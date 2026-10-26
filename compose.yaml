@@ -1,7 +1,7 @@
 name: tally-private
 services:
   db:
-    image: postgres:17.9-alpine
+    image: postgres:18.4-alpine
     environment:
       POSTGRES_USER: tally
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run pnpm init}
