@@ -1,4 +1,4 @@
-FROM node:26.13.0-bookworm-slim AS build
+FROM node:24.19.0-bookworm-slim AS build
 RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 RUN npm install -g pnpm@11.19.0
 WORKDIR /app
