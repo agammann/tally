@@ -31,7 +31,7 @@ jobs:
             docker --version
             docker compose version
             docker compose exec -T db postgres --version
-            docker image inspect postgres:17.9-alpine --format '{{json .RepoDigests}}'
+            docker image inspect postgres:18.4-alpine --format '{{json .RepoDigests}}'
           } > work/integration-runtime.txt
       - run: pnpm db:generate && pnpm db:migrate && pnpm build
       - run: pnpm exec tsc --noEmit && pnpm test && pnpm audit --prod

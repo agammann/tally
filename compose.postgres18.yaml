@@ -1,9 +1,0 @@
-# Explicit opt-in for an operator-reviewed PostgreSQL 17 -> 18 migration.
-# Requires Docker Compose 2.24.4 or later for !override.
-services:
-  db:
-    image: postgres:18.4-alpine
-    volumes: !override
-      - tally-data-pg18:/var/lib/postgresql
-volumes:
-  tally-data-pg18:

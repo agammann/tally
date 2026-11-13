@@ -1,0 +1,5 @@
+# Use only while manually restoring a verified PostgreSQL 17 dump.
+services:
+  db:
+    environment:
+      TALLY_PG18_RESTORE: '1'

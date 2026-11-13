@@ -1,0 +1,8 @@
+# Use for the retained PostgreSQL 17 database during backup or rollback.
+services:
+  db:
+    image: postgres:17.9-alpine
+    entrypoint: ['/usr/local/bin/docker-entrypoint.sh']
+    command: ['postgres']
+    volumes: !override
+      - tally-data:/var/lib/postgresql/data

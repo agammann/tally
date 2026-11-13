@@ -1,15 +1,31 @@
 name: tally-private
 services:
   db:
-    image: postgres:17.9-alpine
+    image: postgres:18.4-alpine
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        if [ -n "$$(ls -A /tally-legacy)" ] && [ "$${TALLY_PG18_RESTORE:-}" != 1 ]; then
+          marker=/var/lib/postgresql/.tally-pg18-restored
+          if [ ! -f "$$marker" ] || [ -L "$$marker" ] || [ "$$(cat "$$marker")" != 'tally-pg18-restore-v1' ]; then
+            echo 'Existing PostgreSQL 17 data detected. Follow the PostgreSQL 18 migration instructions before starting the database.' >&2
+            exit 1
+          fi
+        fi
+        exec /usr/local/bin/docker-entrypoint.sh "$$@"
+      - --
+    command: ['postgres']
     environment:
       POSTGRES_USER: tally
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run pnpm init}
       POSTGRES_DB: tally
     ports: ['127.0.0.1:55487:5432']
-    volumes: [tally-data:/var/lib/postgresql/data]
+    volumes:
+      - tally-data:/tally-legacy:ro
+      - tally-data-pg18:/var/lib/postgresql
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U tally -d tally']
+      test: ['CMD-SHELL', 'pg_isready -h 127.0.0.1 -U tally -d tally']
       interval: 5s
       timeout: 3s
       retries: 20
@@ -48,3 +64,4 @@ services:
     profiles: [app]
 volumes:
   tally-data:
+  tally-data-pg18:

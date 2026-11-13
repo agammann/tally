@@ -1,6 +1,6 @@
 # Private operation and recovery
 
-Use the root README for a fresh installation. Compose runs PostgreSQL 17.9 with a named volume, an explicit one-shot migration service, and a non-root Node application process behind Docker's init process. The database and dashboard bind only to loopback on the host. No public cloud or paid service is provisioned.
+Use the root README for a fresh installation. Compose runs PostgreSQL 18.4 with a named volume, an explicit one-shot migration service, and a non-root Node application process behind Docker's init process. Existing PostgreSQL 17 installations must follow the major-version migration below. The database and dashboard bind only to loopback on the host. No public cloud or paid service is provisioned.
 
 ## Configuration
 
@@ -102,45 +102,54 @@ The recovery command delegates hashing to Better Auth, changes the existing owne
 
 The initial-to-second migration adds only an index and was tested with existing records. It does not require application code changes and the previous schema-compatible application can read the upgraded database. **No destructive down-migration or general migration rollback is verified.** If a future migration is incompatible, recover a verified backup into a new database and run the matching application revision; later accepted events are absent from that backup. Do not blindly run `migrate reset` or modify an applied migration.
 
-### Rehearsed PostgreSQL 17 to 18 migration
+### PostgreSQL 17 to 18 migration
 
-The default Compose file remains on PostgreSQL 17.9. The optional `compose.postgres18.yaml` uses PostgreSQL 18.4 and a **separate** `tally-data-pg18` volume mounted at PostgreSQL 18's expected parent directory. It requires Docker Compose 2.24.4 or later. PostgreSQL 18 cannot directly use the existing PostgreSQL 17 data directory; never point the new image at the old volume. `node scripts/rehearse-postgres-18.mjs` uses only disposable containers and fictional rows to test a PostgreSQL 17 custom dump, restoration into 18, Prisma migration status, a new write, and rollback to the untouched 17 volume. It does not validate an actual installation, application login, or reports.
+The default Compose file uses PostgreSQL 18.4 and a **separate** `tally-data-pg18` volume mounted at PostgreSQL 18's expected parent directory. It requires Docker Compose 2.24.4 or later for the rollback override. PostgreSQL 18 cannot directly use the existing PostgreSQL 17 data directory; never point the new image at the old volume. The database entrypoint refuses normal startup if the old volume contains files and the 18 volume has no correctly formatted completed-restore marker. The marker is an operator confirmation, not a cryptographic integrity check or proof that the correct backup was restored. The restore override below bypasses that guard only for the operator-controlled restoration.
+
+`node scripts/rehearse-postgres-18.mjs` uses only disposable containers and fictional rows to test a PostgreSQL 17 custom dump, restoration into 18, Prisma migration status, a new write, and rollback to the untouched 17 volume. `node scripts/test-pg18-startup-guard.mjs` checks fresh startup, blocking on legacy data, and the restore override and marker. `node scripts/rehearse-pg18-compose.mjs` exercises the guarded Compose cutover and rollback with real Tally migrations and fictional data. These tests do not validate an actual installation, application login, or reports.
 
 Before an actual migration, test the backup and restore for your installation, make an encrypted off-host backup, record the exact source revision and Compose project name, and ensure enough disk space. Arrange downtime and stop every writer. Confirm the target `tally-data-pg18` volume for your Compose project **does not already exist**; do not overwrite an existing target. The standard project name is `tally-private` and its target volume is `tally-private_tally-data-pg18`; custom project names use a different prefix. Preserve the original `tally-data` volume and its PostgreSQL 17 image.
 
-1. With the existing PostgreSQL 17 Compose configuration running, stop the dashboard and all external collectors. Create a new, access-controlled backup path that does not already exist. For example:
+1. Stop the dashboard and all external collectors. With the previous source revision or the PostgreSQL 17 override below, start the existing database for backup. Create a new, access-controlled backup path that does not already exist. For example:
 
    ```sh
    docker compose --profile app stop app
-   docker compose exec -T db pg_dump -U tally -d tally -Fc -f /tmp/tally-pg17.dump
-   docker compose cp db:/tmp/tally-pg17.dump backups/tally-pg17.dump
-   docker compose exec -T db rm /tmp/tally-pg17.dump
-   docker compose stop db
+   docker compose -f compose.yaml -f compose.postgres17.yaml up -d --wait db
+   docker compose -f compose.yaml -f compose.postgres17.yaml exec -T db pg_dump -U tally -d tally -Fc -f /tmp/tally-pg17.dump
+   docker compose -f compose.yaml -f compose.postgres17.yaml cp db:/tmp/tally-pg17.dump backups/tally-pg17.dump
+   docker compose -f compose.yaml -f compose.postgres17.yaml exec -T db rm /tmp/tally-pg17.dump
+   docker compose -f compose.yaml -f compose.postgres17.yaml stop db
    ```
 
    Check that the backup exists and can be restored before continuing. `docker compose cp` can overwrite its destination, so choose and verify a new path first. Do not use PowerShell text redirection for the binary dump.
-2. With the same Compose project name, start the clean 18 database with the opt-in override, copy the verified dump into it, and restore into its empty `tally` database:
+2. With the same Compose project name, start **only** the clean 18 database with the restore override, copy the verified dump into it, and restore into its empty `tally` database. Do not start the application or collectors using this override:
 
    ```sh
-   docker compose -f compose.yaml -f compose.postgres18.yaml up -d --wait db
-   docker compose -f compose.yaml -f compose.postgres18.yaml cp backups/tally-pg17.dump db:/tmp/tally-pg17.dump
-   docker compose -f compose.yaml -f compose.postgres18.yaml exec -T db pg_restore --exit-on-error --no-owner -U tally -d tally /tmp/tally-pg17.dump
-   docker compose -f compose.yaml -f compose.postgres18.yaml exec -T db rm /tmp/tally-pg17.dump
+   docker compose -f compose.yaml -f compose.postgres18-restore.yaml up -d --wait db
+   docker compose -f compose.yaml -f compose.postgres18-restore.yaml cp backups/tally-pg17.dump db:/tmp/tally-pg17.dump
+   docker compose -f compose.yaml -f compose.postgres18-restore.yaml exec -T db pg_restore --exit-on-error --no-owner -U tally -d tally /tmp/tally-pg17.dump
+   docker compose -f compose.yaml -f compose.postgres18-restore.yaml exec -T db rm /tmp/tally-pg17.dump
    ```
 
-   If restoration fails, leave the original 17 volume intact; investigate before restarting writers. A partially restored target is not a verified database.
-3. Start the migration and application services using the same two files:
+   If restoration fails, leave the original 17 volume intact; investigate before restarting writers. A partially restored target is not a verified database. Compare expected project and event counts in the restored database, and only after a successful restore create the completion marker:
 
    ```sh
-   docker compose -f compose.yaml -f compose.postgres18.yaml --profile app up --build -d
+   docker compose -f compose.yaml -f compose.postgres18-restore.yaml exec -T db sh -c 'printf "tally-pg18-restore-v1\n" > /var/lib/postgresql/.tally-pg18-restored.tmp && mv /var/lib/postgresql/.tally-pg18-restored.tmp /var/lib/postgresql/.tally-pg18-restored'
+   docker compose -f compose.yaml -f compose.postgres18-restore.yaml stop db
+   ```
+
+3. Start the migration and application services using the default Compose file, without the restore override:
+
+   ```sh
+   docker compose --profile app up --build -d
    ```
 
    Verify migration status, readiness, owner login, project and event counts, and representative reports before re-enabling collectors. Retain both the protected dump and old volume through the verification period.
 4. To roll back before accepting new writes, stop the 18 application and database, then start the prior source revision using only its PostgreSQL 17 Compose file:
 
    ```sh
-   docker compose -f compose.yaml -f compose.postgres18.yaml --profile app stop app db
-   docker compose -f compose.yaml --profile app up --build -d
+   docker compose --profile app stop app db
+   docker compose -f compose.yaml -f compose.postgres17.yaml --profile app up --build -d
    ```
 
    Check the project name and verify readiness and reports. The old volume is a snapshot from the cutover: **writes accepted on 18 are not present on 17**. If any occurred, preserve and back up the 18 volume for reconciliation; rollback alone does not migrate them back.
