@@ -1,11 +1,11 @@
 import './env';
 import {qa,saveQa} from './qa-state';
-import {PrismaClient} from '@prisma/client';
+import {createDb} from '../prisma/client';
 import {randomBytes} from 'node:crypto';
 import {spawn} from 'node:child_process';
 import {writeFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
-const db=new PrismaClient({log:[]});
+const db=createDb();
 const origin='http://localhost:3000';
 const login=(password:string)=>fetch(origin+'/api/auth/sign-in/email',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({email:qa.email,password})});
 async function main(){
