@@ -1,5 +1,15 @@
 # Tally release readiness
 
+## Version 1.0.1 preparation
+
+Prepared November 12, 2026 (November 13 UTC). This source release includes the dependency fixes merged since 1.0.0, the coordinated Prisma 7 migration, and Vite 8.2.6 with patched Rolldown. The application remains Next.js; the Vite advisory concerns exposed development servers. The SDK archive has no runtime dependencies and keeps its public API and event schema 1.
+
+The [Prisma migration verification](https://github.com/agammann/tally/actions/runs/43365994322) passed production builds, 22 unit tests, real authentication and ingestion, backup/restore, transaction rollback followed by a separate commit, ORM/raw-query schema isolation, retention, owner recovery, and bounded workload checks. Flagged Chromium 158.0.8127.18 used real WebMCP APIs and persisted seven events covering success, failure, and cancellation. These checks used disposable databases.
+
+The versioned release candidate must pass the same complete hosted verification, independent SDK consumer, and package checks before publication. The publisher preserves the existing 1.0.0 release and creates 1.0.1 only at the verified main commit. Local full dependency audits are a dated registry result, not a guarantee: the registry audit did not report GHSA-p4f5-76q4-ffq7, so the Vite update was checked against the upstream advisory and release dependency metadata directly.
+
+Historical evidence below retains its original dates and browser versions.
+
 ## Version 1.0 candidate verification
 
 Executed October 6, 2026, America/Los_Angeles, from a clean copy of main with the 1.0 release changes. Machine evidence uses October 7 UTC timestamps. The self-hosted application was built in Docker and run against a new isolated PostgreSQL volume. No production owner or existing installation data was used.

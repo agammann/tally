@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.1
+
+Release preparation dated November 12, 2026.
+
+- Deliver the verified dependency fixes accumulated since 1.0.0 in a new source release, including patched authentication, framework, validation, and development tooling. Vite 8.2.6 and its patched Rolldown dependency address GHSA-p4f5-76q4-ffq7; Tally serves Next.js and does not expose a Vite development server by default.
+- Upgrade Prisma CLI, client, and PostgreSQL adapter together to 7.10.1. Keep the existing database models and migration history, support credentialless builds, and verify transaction rollback, database selection, and ORM/raw-query schema consistency. See the operations guide for the adapter's connection pool settings.
+- Verify native WebMCP execution with Playwright 1.65 and flagged Chromium 158, retaining persisted success/failure/cancellation and owner recovery checks.
+- Align installation, application, container, and SDK labels at 1.0.1. The SDK remains dependency-free with the same public API and event schema 1. Publish a new immutable tag and SDK assets after the complete release gate passes; leave 1.0.0 unchanged.
+
 ## 1.0.0
 
 Release preparation dated October 6, 2026.
