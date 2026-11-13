@@ -20,7 +20,12 @@ jobs:
       - run: npm install --global pnpm@11.19.0
       - run: pnpm install --frozen-lockfile
       - run: pnpm run init
-      - run: docker compose up -d --wait db
+      - name: Initialize the disposable PostgreSQL 18 database
+        run: |
+          docker compose -f compose.yaml -f compose.postgres18-init.yaml up -d --wait db
+          docker compose -f compose.yaml -f compose.postgres18-init.yaml exec -T db sh -c 'printf tally-pg18-fresh-v1 > /var/lib/postgresql/.tally-pg18-restored.tmp && mv /var/lib/postgresql/.tally-pg18-restored.tmp /var/lib/postgresql/.tally-pg18-restored'
+          docker compose -f compose.yaml -f compose.postgres18-init.yaml stop db
+          docker compose up -d --wait db
       - name: Record exact disposable integration runtime
         run: |
           mkdir -p work
@@ -31,7 +36,7 @@ jobs:
             docker --version
             docker compose version
             docker compose exec -T db postgres --version
-            docker image inspect postgres:17.9-alpine --format '{{json .RepoDigests}}'
+            docker image inspect postgres:18.4-alpine --format '{{json .RepoDigests}}'
           } > work/integration-runtime.txt
       - run: pnpm db:generate && pnpm db:migrate && pnpm build
       - run: pnpm exec tsc --noEmit && pnpm test && pnpm audit --prod

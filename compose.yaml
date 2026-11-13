@@ -1,15 +1,45 @@
 name: tally-private
 services:
   db:
-    image: postgres:17.9-alpine
+    image: postgres:18.4-alpine
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        legacy=$$(ls -A /tally-legacy) || { echo 'Cannot inspect legacy database volume.' >&2; exit 1; }
+        if [ "$${TALLY_PG18_INIT:-}" = 1 ]; then
+          target=$$(ls -A /var/lib/postgresql) || { echo 'Cannot inspect PostgreSQL 18 volume.' >&2; exit 1; }
+          if [ -n "$$legacy" ] || [ -n "$$target" ]; then
+            echo 'Fresh initialization requires empty legacy and PostgreSQL 18 volumes. Follow the recovery instructions.' >&2
+            exit 1
+          fi
+        elif [ "$${TALLY_PG18_RESTORE:-}" != 1 ]; then
+          marker=/var/lib/postgresql/.tally-pg18-restored
+          version=/var/lib/postgresql/18/docker/PG_VERSION
+          control=/var/lib/postgresql/18/docker/global/pg_control
+          if [ ! -f "$$marker" ] || [ -L "$$marker" ] || [ -L /var/lib/postgresql/18 ] || [ -L /var/lib/postgresql/18/docker ] || [ -L /var/lib/postgresql/18/docker/global ] || [ ! -f "$$version" ] || [ -L "$$version" ] || [ "$$(cat "$$version")" != 18 ] || [ ! -f "$$control" ] || [ -L "$$control" ]; then
+            echo 'PostgreSQL 18 requires explicit fresh initialization or migration. Follow the setup or migration instructions.' >&2
+            exit 1
+          fi
+          state=$$(cat "$$marker")
+          if [ "$$state" != 'tally-pg18-restore-v1' ] && { [ "$$state" != 'tally-pg18-fresh-v1' ] || [ -n "$$legacy" ]; }; then
+            echo 'PostgreSQL 18 marker does not match the legacy volume state. Follow the migration instructions.' >&2
+            exit 1
+          fi
+        fi
+        exec /usr/local/bin/docker-entrypoint.sh "$$@"
+      - --
+    command: ['postgres']
     environment:
       POSTGRES_USER: tally
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run pnpm init}
       POSTGRES_DB: tally
     ports: ['127.0.0.1:55487:5432']
-    volumes: [tally-data:/var/lib/postgresql/data]
+    volumes:
+      - tally-data:/tally-legacy:ro
+      - tally-data-pg18:/var/lib/postgresql
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U tally -d tally']
+      test: ['CMD-SHELL', 'pg_isready -h 127.0.0.1 -U tally -d tally']
       interval: 5s
       timeout: 3s
       retries: 20
@@ -48,3 +78,4 @@ services:
     profiles: [app]
 volumes:
   tally-data:
+  tally-data-pg18:
