@@ -69,7 +69,29 @@ jobs:
             artifacts/SHA256SUMS
           if-no-files-found: error
           overwrite: true
-      - name: Download and verify the uploaded SDK archive
+      - name: Download the uploaded SDK archive
+        id: artifact-download-first
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: tally-release
+          path: ${{ runner.temp }}/tally-release-roundtrip
+      - name: Wait for artifact visibility
+        if: steps.artifact-download-first.outcome == 'failure'
+        run: sleep 10
+      - name: Retry SDK artifact download
+        id: artifact-download-second
+        if: steps.artifact-download-first.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: tally-release
+          path: ${{ runner.temp }}/tally-release-roundtrip
+      - name: Wait for artifact visibility again
+        if: steps.artifact-download-second.outcome == 'failure'
+        run: sleep 20
+      - name: Final SDK artifact download attempt
+        if: steps.artifact-download-second.outcome == 'failure'
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: tally-release
@@ -117,3 +139,43 @@ jobs:
           script: |
             const publish = require('./scripts/release.cjs');
             await publish({ github, context, core });
+  retry-guard-test:
+    name: Verify artifact failure guards
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Missing artifact attempt one
+        id: first
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: intentionally-missing-artifact
+      - name: Missing artifact attempt two
+        id: second
+        if: steps.first.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: intentionally-missing-artifact
+      - name: Missing artifact attempt three
+        id: third
+        if: steps.second.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: intentionally-missing-artifact
+      - name: Require all missing-artifact attempts to fail
+        if: always()
+        env:
+          FIRST: ${{ steps.first.outcome }}
+          SECOND: ${{ steps.second.outcome }}
+          THIRD: ${{ steps.third.outcome }}
+        run: test "$FIRST" = failure && test "$SECOND" = failure && test "$THIRD" = failure
+      - name: Reject an incorrect archive hash
+        run: |
+          printf 'fixture' > "$RUNNER_TEMP/retry-fixture"
+          printf '%064d  %s\n' 0 "$RUNNER_TEMP/retry-fixture" > "$RUNNER_TEMP/retry-fixture.sha256"
+          if sha256sum -c "$RUNNER_TEMP/retry-fixture.sha256"; then
+            echo 'Incorrect hash was accepted' >&2
+            exit 1
+          fi
