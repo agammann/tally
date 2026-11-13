@@ -139,3 +139,43 @@ jobs:
           script: |
             const publish = require('./scripts/release.cjs');
             await publish({ github, context, core });
+  retry-guard-test:
+    name: Verify artifact failure guards
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Missing artifact attempt one
+        id: first
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: intentionally-missing-artifact
+      - name: Missing artifact attempt two
+        id: second
+        if: steps.first.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: intentionally-missing-artifact
+      - name: Missing artifact attempt three
+        id: third
+        if: steps.second.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: intentionally-missing-artifact
+      - name: Require all missing-artifact attempts to fail
+        if: always()
+        env:
+          FIRST: ${{ steps.first.outcome }}
+          SECOND: ${{ steps.second.outcome }}
+          THIRD: ${{ steps.third.outcome }}
+        run: test "$FIRST" = failure && test "$SECOND" = failure && test "$THIRD" = failure
+      - name: Reject an incorrect archive hash
+        run: |
+          printf 'fixture' > "$RUNNER_TEMP/retry-fixture"
+          printf '%064d  %s\n' 0 "$RUNNER_TEMP/retry-fixture" > "$RUNNER_TEMP/retry-fixture.sha256"
+          if sha256sum -c "$RUNNER_TEMP/retry-fixture.sha256"; then
+            echo 'Incorrect hash was accepted' >&2
+            exit 1
+          fi
