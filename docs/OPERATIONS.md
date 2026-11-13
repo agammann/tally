@@ -149,14 +149,14 @@ Before an actual migration, test the backup and restore for your installation, m
    ```
 
    Verify migration status, readiness, owner login, project and event counts, and representative reports before re-enabling collectors. Retain both the protected dump and old volume through the verification period.
-4. To roll back before accepting new writes, stop the 18 application and database, then start the prior source revision using only its PostgreSQL 17 Compose file:
+4. To roll back before accepting new writes, stop the 18 application and database. From this source revision, use its PostgreSQL 17 override to start the old volume with the current schema-compatible application:
 
    ```sh
    docker compose --profile app stop app db
    docker compose -f compose.yaml -f compose.postgres17.yaml --profile app up --build -d
    ```
 
-   Check the project name and verify readiness and reports. The old volume is a snapshot from the cutover: **writes accepted on 18 are not present on 17**. If any occurred, preserve and back up the 18 volume for reconciliation; rollback alone does not migrate them back.
+   Alternatively, switch to the prior source revision and use that revision's original Compose file and compatible application image; that older checkout does not contain `compose.postgres17.yaml`. In either case, check the project name and verify readiness and reports. The old volume is a snapshot from the cutover: **writes accepted on 18 are not present on 17**. If any occurred, preserve and back up the 18 volume for reconciliation; rollback alone does not migrate them back.
 
 ## Performance and limits
 

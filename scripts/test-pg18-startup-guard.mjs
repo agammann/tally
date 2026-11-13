@@ -32,6 +32,9 @@ for (const args of [
 ]) {
   if (expect(args, 0).stdout.trim()) throw new Error('Generated test project already exists');
 }
+for (const name of [legacy, target]) {
+  if (docker(['volume', 'inspect', name]).status === 0) throw new Error('Generated test volume already exists');
+}
 try {
   // Normal startup never infers that empty volumes mean a fresh installation.
   expect([...base, 'run', '--rm', '--no-deps', 'db', 'true'], 1);

@@ -34,6 +34,9 @@ for (const args of [
   ['volume', 'ls', '--filter', `label=com.docker.compose.project=${project}`, '--format', '{{.Name}}'],
   ['network', 'ls', '--filter', `label=com.docker.compose.project=${project}`, '--format', '{{.ID}}'],
 ]) if (docker(...args).toString().trim()) throw new Error('Generated test project already exists');
+for (const name of [`${project}_tally-data`, `${project}_tally-data-pg18`]) {
+  if (spawnSync('docker', ['volume', 'inspect', name], { env, stdio: 'ignore' }).status === 0) throw new Error('Generated test volume already exists');
+}
 const snapshot = `SELECT (SELECT count(*) FROM "User") || ':' || (SELECT count(*) FROM "Project") || ':' || (SELECT count(*) FROM "Event") || ':' || (SELECT count(*) FROM "_prisma_migrations" WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL);`;
 try {
   compose(old, 'up', '-d', '--wait', 'db');

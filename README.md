@@ -22,7 +22,7 @@ This is a software product, not a contest submission. It runs without a paid ser
 
 Requirements: Node.js 24 LTS, **pnpm 11.19.0**, Docker with Compose v2. Ports 3000, 3001 (optional storefront), and 55487 (local PostgreSQL) must be free. These commands work from a checked-out source directory in PowerShell or a POSIX shell.
 
-Download and extract **Source code (zip)** or **Source code (tar.gz)** from the [v1.0.1 release](https://github.com/agammann/tally/releases/tag/v1.0.1), then open a terminal in the extracted directory. The tagged source includes the application, migrations, SDK, MIT license, and operations documentation. The release publishes only after the complete verification job passes; a release asset is not a prebuilt application container.
+The PostgreSQL 18 instructions below apply to a checkout of this repository revision, which includes `compose.postgres18-init.yaml`. The published [v1.0.1 release](https://github.com/agammann/tally/releases/tag/v1.0.1) contains older PostgreSQL 17 source and does not include that override; if using that release archive, follow the README included in the archive. This source update does not change the published release. The source contains the application, migrations, SDK, MIT license, and operations documentation; it is not a prebuilt application container.
 
 For a **new installation only**, first confirm that no previous Tally database exists in another Compose project, external volume, or bind mount. Existing installations must use the [PostgreSQL 17 to 18 migration instructions](docs/OPERATIONS.md#postgresql-17-to-18-migration); do not use the fresh-initialization override for an upgrade.
 
