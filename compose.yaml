@@ -6,10 +6,24 @@ services:
       - /bin/sh
       - -ec
       - |
-        if [ -n "$$(ls -A /tally-legacy)" ] && [ "$${TALLY_PG18_RESTORE:-}" != 1 ]; then
+        legacy=$$(ls -A /tally-legacy) || { echo 'Cannot inspect legacy database volume.' >&2; exit 1; }
+        if [ "$${TALLY_PG18_INIT:-}" = 1 ]; then
+          target=$$(ls -A /var/lib/postgresql) || { echo 'Cannot inspect PostgreSQL 18 volume.' >&2; exit 1; }
+          if [ -n "$$legacy" ] || [ -n "$$target" ]; then
+            echo 'Fresh initialization requires empty legacy and PostgreSQL 18 volumes. Follow the recovery instructions.' >&2
+            exit 1
+          fi
+        elif [ "$${TALLY_PG18_RESTORE:-}" != 1 ]; then
           marker=/var/lib/postgresql/.tally-pg18-restored
-          if [ ! -f "$$marker" ] || [ -L "$$marker" ] || [ "$$(cat "$$marker")" != 'tally-pg18-restore-v1' ]; then
-            echo 'Existing PostgreSQL 17 data detected. Follow the PostgreSQL 18 migration instructions before starting the database.' >&2
+          version=/var/lib/postgresql/18/docker/PG_VERSION
+          control=/var/lib/postgresql/18/docker/global/pg_control
+          if [ ! -f "$$marker" ] || [ -L "$$marker" ] || [ -L /var/lib/postgresql/18 ] || [ -L /var/lib/postgresql/18/docker ] || [ -L /var/lib/postgresql/18/docker/global ] || [ ! -f "$$version" ] || [ -L "$$version" ] || [ "$$(cat "$$version")" != 18 ] || [ ! -f "$$control" ] || [ -L "$$control" ]; then
+            echo 'PostgreSQL 18 requires explicit fresh initialization or migration. Follow the setup or migration instructions.' >&2
+            exit 1
+          fi
+          state=$$(cat "$$marker")
+          if [ "$$state" != 'tally-pg18-restore-v1' ] && { [ "$$state" != 'tally-pg18-fresh-v1' ] || [ -n "$$legacy" ]; }; then
+            echo 'PostgreSQL 18 marker does not match the legacy volume state. Follow the migration instructions.' >&2
             exit 1
           fi
         fi

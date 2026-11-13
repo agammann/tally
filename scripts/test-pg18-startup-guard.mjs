@@ -33,18 +33,29 @@ for (const args of [
   if (expect(args, 0).stdout.trim()) throw new Error('Generated test project already exists');
 }
 try {
-  // A fresh installation starts a real PostgreSQL 18 server without host ports.
-  expect([...base, 'up', '-d', '--wait', 'db'], 0);
-  const version = expect([...base, 'exec', '-T', 'db', 'psql', '-U', 'tally', '-d', 'tally', '-At', '-c', 'SHOW server_version_num'], 0).stdout.trim();
+  // Normal startup never infers that empty volumes mean a fresh installation.
+  expect([...base, 'run', '--rm', '--no-deps', 'db', 'true'], 1);
+  // The explicit fresh override starts a real server without host ports.
+  const fresh = [...base, '-f', 'compose.postgres18-init.yaml'];
+  expect([...fresh, 'up', '-d', '--wait', 'db'], 0);
+  const version = expect([...fresh, 'exec', '-T', 'db', 'psql', '-U', 'tally', '-d', 'tally', '-At', '-c', 'SHOW server_version_num'], 0).stdout.trim();
   assert.ok(Number(version) >= 180000 && Number(version) < 190000);
-  expect([...base, 'stop', 'db'], 0);
+  // Fresh initialization cannot run again over the now-populated target.
+  expect([...fresh, 'run', '--rm', '--no-deps', 'db', 'true'], 1);
+  expect([...fresh, 'exec', '-T', 'db', 'sh', '-c', 'printf "tally-pg18-fresh-v1\\n" > /var/lib/postgresql/.tally-pg18-restored'], 0);
+  expect([...fresh, 'stop', 'db'], 0);
+  expect([...base, 'run', '--rm', '--no-deps', 'db', 'true'], 0);
+  // Failed inspection must fail closed instead of looking like an empty volume.
+  const unreadable = expect([...base, 'run', '--rm', '--no-deps', '-e', 'PATH=/nonexistent', 'db', 'true'], 1);
+  assert.match(unreadable.stderr, /Cannot inspect legacy database volume/);
   expect(['run', '--rm', '--network', 'none', '--entrypoint', 'sh', '-v', `${legacy}:/test`, 'postgres:18.4-alpine', '-c', 'printf 17 > /test/PG_VERSION'], 0);
   // Legacy files block normal startup, even if an 18 volume exists.
   const blocked = expect([...base, 'run', '--rm', '--no-deps', 'db', 'true'], 1);
-  assert.match(blocked.stderr, /Existing PostgreSQL 17 data detected/);
+  assert.match(blocked.stderr, /marker does not match the legacy volume state/);
   // Any legacy files block, even when PG_VERSION is missing or damaged.
   expect(['run', '--rm', '--network', 'none', '--entrypoint', 'sh', '-v', `${legacy}:/test`, 'postgres:18.4-alpine', '-c', 'rm /test/PG_VERSION; printf partial > /test/legacy-file'], 0);
   expect([...base, 'run', '--rm', '--no-deps', 'db', 'true'], 1);
+  expect([...fresh, 'run', '--rm', '--no-deps', 'db', 'true'], 1);
   // Only the explicit restore override can start a database before the marker.
   expect([...base, '-f', 'compose.postgres18-restore.yaml', 'run', '--rm', '--no-deps', 'db', 'true'], 0);
   for (const command of [
@@ -57,7 +68,18 @@ try {
   }
   expect(['run', '--rm', '--network', 'none', '--entrypoint', 'sh', '-v', `${target}:/test`, 'postgres:18.4-alpine', '-c', 'rm /test/.tally-pg18-restored; printf "tally-pg18-restore-v1\\n" > /test/.tally-pg18-restored'], 0);
   expect([...base, 'run', '--rm', '--no-deps', 'db', 'true'], 0);
-  console.log('PASS: fresh install allowed; legacy data blocked; explicit restore override and completion marker allowed.');
+  // A valid marker cannot authorize reinitializing a missing or reset cluster.
+  expect(['run', '--rm', '--network', 'none', '--entrypoint', 'sh', '-v', `${target}:/test`, 'postgres:18.4-alpine', '-c', 'mv /test/18/docker/PG_VERSION /test/18/docker/PG_VERSION.saved'], 0);
+  expect([...base, 'run', '--rm', '--no-deps', 'db', 'true'], 1);
+  expect(['run', '--rm', '--network', 'none', '--entrypoint', 'sh', '-v', `${target}:/test`, 'postgres:18.4-alpine', '-c', 'printf 17 > /test/18/docker/PG_VERSION'], 0);
+  expect([...base, 'run', '--rm', '--no-deps', 'db', 'true'], 1);
+  expect(['run', '--rm', '--network', 'none', '--entrypoint', 'sh', '-v', `${target}:/test`, 'postgres:18.4-alpine', '-c', 'rm /test/18/docker/PG_VERSION; ln -s PG_VERSION.saved /test/18/docker/PG_VERSION'], 0);
+  expect([...base, 'run', '--rm', '--no-deps', 'db', 'true'], 1);
+  expect(['run', '--rm', '--network', 'none', '--entrypoint', 'sh', '-v', `${target}:/test`, 'postgres:18.4-alpine', '-c', 'rm /test/18/docker/PG_VERSION; mv /test/18/docker/PG_VERSION.saved /test/18/docker/PG_VERSION; mv /test/18/docker/global/pg_control /test/18/docker/global/pg_control.saved'], 0);
+  expect([...base, 'run', '--rm', '--no-deps', 'db', 'true'], 1);
+  expect(['run', '--rm', '--network', 'none', '--entrypoint', 'sh', '-v', `${target}:/test`, 'postgres:18.4-alpine', '-c', 'mv /test/18/docker/global/pg_control.saved /test/18/docker/global/pg_control'], 0);
+  expect([...base, 'run', '--rm', '--no-deps', 'db', 'true'], 0);
+  console.log('PASS: explicit fresh initialization, populated-target refusal, legacy inspection, restore override, and cluster/marker guards.');
 } finally {
   // The project name was generated above; only its test resources are removed.
   docker([...base, 'down', '--volumes', '--remove-orphans']);

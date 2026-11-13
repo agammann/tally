@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'compose.postgres18-restore.yaml'
+      - 'compose.postgres18-init.yaml'
       - 'compose.postgres17.yaml'
       - 'compose.yaml'
       - 'scripts/rehearse-postgres-18.mjs'

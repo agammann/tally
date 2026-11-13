@@ -1,0 +1,5 @@
+# Use only for a confirmed fresh installation with two empty database volumes.
+services:
+  db:
+    environment:
+      TALLY_PG18_INIT: '1'

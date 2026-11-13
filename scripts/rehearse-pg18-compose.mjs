@@ -47,7 +47,7 @@ INSERT INTO "Event" ("projectId","eventId","schemaVersion",kind,environment,sour
   compose(old, 'stop', 'db');
   const blocked = spawnSync('docker', [...base, 'run', '--rm', '--no-deps', 'db', 'true'], { env, encoding: 'utf8' });
   assert.equal(blocked.status, 1);
-  assert.match(blocked.stderr, /Existing PostgreSQL 17 data detected/);
+  assert.match(blocked.stderr, /requires explicit fresh initialization or migration/);
   compose(restore, 'up', '-d', '--wait', 'db');
   run('docker', [...restore, 'exec', '-T', 'db', 'pg_restore', '--exit-on-error', '--no-owner', '-U', 'tally', '-d', 'tally'], { input: dump });
   assert.equal(query(restore, snapshot), before);

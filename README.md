@@ -24,10 +24,15 @@ Requirements: Node.js 24 LTS, **pnpm 11.19.0**, Docker with Compose v2. Ports 30
 
 Download and extract **Source code (zip)** or **Source code (tar.gz)** from the [v1.0.1 release](https://github.com/agammann/tally/releases/tag/v1.0.1), then open a terminal in the extracted directory. The tagged source includes the application, migrations, SDK, MIT license, and operations documentation. The release publishes only after the complete verification job passes; a release asset is not a prebuilt application container.
 
+For a **new installation only**, first confirm that no previous Tally database exists in another Compose project, external volume, or bind mount. Existing installations must use the [PostgreSQL 17 to 18 migration instructions](docs/OPERATIONS.md#postgresql-17-to-18-migration); do not use the fresh-initialization override for an upgrade.
+
 ```sh
 npm install --global pnpm@11.19.0
 pnpm install --frozen-lockfile
 pnpm run init
+docker compose -f compose.yaml -f compose.postgres18-init.yaml up -d --wait db
+docker compose -f compose.yaml -f compose.postgres18-init.yaml exec -T db sh -c 'printf tally-pg18-fresh-v1 > /var/lib/postgresql/.tally-pg18-restored.tmp && mv /var/lib/postgresql/.tally-pg18-restored.tmp /var/lib/postgresql/.tally-pg18-restored'
+docker compose -f compose.yaml -f compose.postgres18-init.yaml stop db
 docker compose --profile app up --build -d
 ```
 
@@ -35,7 +40,7 @@ Open `http://localhost:3000` after starting your local installation. Read `SETUP
 
 Create a project in **Setup**. Enter the allowed browser origins and exact tool/environment/release/error labels. The browser ingestion identifier is public and grants write-only access; your owner session is required to view reports, export, rotate identifiers, change settings, or delete data.
 
-For local development instead of the application container:
+For local development instead of the application container, first complete fresh initialization above or the documented migration, then:
 
 ```sh
 docker compose up -d db
