@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@prisma/client": "7.10.1",
-    "@tailwindcss/postcss": "4.3.3",
+    "@tailwindcss/postcss": "4.3.5",
     "@tally-local/sdk": "workspace:*",
     "@tally-local/shared": "workspace:*",
     "better-auth": "1.7.7",
@@ -21,7 +21,7 @@
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "recharts": "3.10.1",
-    "tailwindcss": "4.3.3",
+    "tailwindcss": "4.3.5",
     "zod": "4.6.7"
   }
 }
