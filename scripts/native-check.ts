@@ -1,4 +1,4 @@
-import './env';import {qa} from './qa-state';import {chromium} from '@playwright/test';import {writeFileSync} from 'node:fs';import assert from 'node:assert/strict';import {PrismaClient} from '@prisma/client';
+import './env';import {qa} from './qa-state';import {chromium} from '@playwright/test';import {writeFileSync} from 'node:fs';import assert from 'node:assert/strict';import {createDb} from '../prisma/client';
 async function main(){const browser=await chromium.launch({headless:true,args:['--enable-features=WebMCP']});const context=await browser.newContext();const page=await context.newPage();const evidence:Record<string,unknown>={checkedAt:new Date().toISOString(),browser:browser.version(),flags:['--enable-features=WebMCP'],polyfills:false};
 const invocations:unknown[]=[];evidence.invocations=invocations;page.on('console',message=>{const text=message.text();if(text.startsWith('TALLY_NATIVE_DIAGNOSTIC ')){const diagnostic=JSON.parse(text.slice('TALLY_NATIVE_DIAGNOSTIC '.length));invocations.push(diagnostic);console.log(text);}});
 try{
@@ -16,7 +16,7 @@ try{
  await page.getByRole('combobox',{name:'Deterministic scenario'}).selectOption('cancellation');evidence.cancellation=await page.evaluate(async()=>{const m=(document as any).modelContext,tools=await m.getTools(),ac=new AbortController();console.info('TALLY_NATIVE_DIAGNOSTIC '+JSON.stringify({phase:'reference.cancellation',names:tools.map((t:any)=>t.name),requested:'check_delivery',found:tools.some((t:any)=>t.name==='check_delivery')}));const p=m.executeTool(tools.find((t:any)=>t.name==='check_delivery'),{zone:'local'},{signal:ac.signal});setTimeout(()=>ac.abort(),50);try{return {resolved:await p};}catch(e){return {rejected:true,name:e instanceof Error?e.name:'unknown'};}});
  await page.getByRole('button',{name:'Flush telemetry'}).click();await page.getByRole('status').filter({hasText:'Flush finished.'}).waitFor();
  assert.equal((evidence.cancellation as {name:string}).name,'AbortError');
- const db=new PrismaClient({log:[]});try{
+ const db=createDb();try{
   const events=await db.event.findMany({where:{projectId:qa.referenceId!,source:'webmcp',receivedAt:{gte:new Date(evidence.checkedAt as string)}},select:{kind:true,outcome:true,tool:true,source:true}});
   for(const outcome of ['success','failure','cancellation'])assert.ok(events.some(e=>e.kind==='tool_finished'&&e.outcome===outcome),'Persisted native outcome: '+outcome);
   evidence.persisted={events:events.length,terminalOutcomes:events.filter(e=>e.kind==='tool_finished').map(e=>({tool:e.tool,outcome:e.outcome,source:e.source}))};

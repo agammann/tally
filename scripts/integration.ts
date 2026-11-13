@@ -1,5 +1,5 @@
-import './env';import {qa,saveQa} from './qa-state';import {PrismaClient} from '@prisma/client';import assert from 'node:assert/strict';import {mkdirSync,writeFileSync} from 'node:fs';
-const db=new PrismaClient({log:[]}),base='http://localhost:3000',origin=base;let cookie='';const results:string[]=[];
+import './env';import {qa,saveQa} from './qa-state';import {createDb} from '../prisma/client';import assert from 'node:assert/strict';import {mkdirSync,writeFileSync} from 'node:fs';
+const db=createDb(),base='http://localhost:3000',origin=base;let cookie='';const results:string[]=[];
 async function http(path:string,body?:unknown,opts:{anon?:boolean;origin?:string;headers?:Record<string,string>}={}){return fetch(base+path,{method:body===undefined?'GET':'POST',headers:{...(body===undefined?{}:{'Content-Type':'application/json',Origin:opts.origin??origin}),...(!opts.anon?{Cookie:cookie}:{}),...opts.headers},body:body===undefined?undefined:typeof body==='string'?body:JSON.stringify(body)});}
 function checked(name:string){results.push(name);console.log('PASS '+name);}
 const definition={name:'Backend verification',origins:['http://localhost:3001'],tools:['test'],environments:['test'],releases:['v1','v2'],errorCodes:['DELIVERY_UNAVAILABLE'],routeLabels:[],workflowName:'checkout',retentionDays:30,dailyQuota:100000};

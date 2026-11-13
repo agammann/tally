@@ -1,4 +1,4 @@
-import {Prisma} from '@prisma/client';
+import {Prisma} from '../../../prisma/client';
 import {batchSchema, type TelemetryEvent} from '@tally-local/shared';
 import {db} from './db';
 import {HttpError} from './auth';
