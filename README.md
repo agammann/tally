@@ -22,7 +22,7 @@ This is a software product, not a contest submission. It runs without a paid ser
 
 Requirements: Node.js 24 LTS, **pnpm 11.19.0**, Docker with Compose v2. Ports 3000, 3001 (optional storefront), and 55487 (local PostgreSQL) must be free. These commands work from a checked-out source directory in PowerShell or a POSIX shell.
 
-Download and extract **Source code (zip)** or **Source code (tar.gz)** from the [v1.0.0 release](https://github.com/agammann/tally/releases/tag/v1.0.0), then open a terminal in the extracted directory. The tagged source includes the application, migrations, SDK, MIT license, and operations documentation. The release publishes only after the complete verification job passes; a release asset is not a prebuilt application container.
+Download and extract **Source code (zip)** or **Source code (tar.gz)** from the [v1.0.1 release](https://github.com/agammann/tally/releases/tag/v1.0.1), then open a terminal in the extracted directory. The tagged source includes the application, migrations, SDK, MIT license, and operations documentation. The release publishes only after the complete verification job passes; a release asset is not a prebuilt application container.
 
 ```sh
 npm install --global pnpm@11.19.0
@@ -49,10 +49,10 @@ The initialization command copies local server settings into `apps/tally/.env.lo
 
 ## Install the SDK in another application
 
-Download `tally-local-sdk-1.0.0.tgz` and its `.sha256` file from the [v1.0.0 release](https://github.com/agammann/tally/releases/tag/v1.0.0). Compare the archive's SHA256 against the checksum before installation:
+Download `tally-local-sdk-1.0.1.tgz` and its `.sha256` file from the [v1.0.1 release](https://github.com/agammann/tally/releases/tag/v1.0.1). Compare the archive's SHA256 against the checksum before installation:
 
 ```powershell
-Get-FileHash ./tally-local-sdk-1.0.0.tgz -Algorithm SHA256
+Get-FileHash ./tally-local-sdk-1.0.1.tgz -Algorithm SHA256
 ```
 
 On Linux use `sha256sum`, or on macOS use `shasum -a 256`. You can also build the same distributable format from a checked-out release:
@@ -62,13 +62,13 @@ pnpm --filter @tally-local/sdk build
 pnpm --filter @tally-local/sdk pack --pack-destination artifacts
 ```
 
-Copy the downloaded archive, or `artifacts/tally-local-sdk-1.0.0.tgz` from your source build, to an independent application and run:
+Copy the downloaded archive, or `artifacts/tally-local-sdk-1.0.1.tgz` from your source build, to an independent application and run:
 
 ```sh
-npm install ./tally-local-sdk-1.0.0.tgz
+npm install ./tally-local-sdk-1.0.1.tgz
 ```
 
-The archive contains ESM, CommonJS and TypeScript declarations, with **no runtime dependencies or monorepo imports**. Use the copyable project-specific example in Setup and the [integration guide](docs/INTEGRATION.md). SDK version **1.0.0** sends event schema **1**; the versions are independent.
+The archive contains ESM, CommonJS and TypeScript declarations, with **no runtime dependencies or monorepo imports**. Use the copyable project-specific example in Setup and the [integration guide](docs/INTEGRATION.md). SDK version **1.0.1** sends event schema **1**; the versions are independent.
 
 ## Reference storefront
 
