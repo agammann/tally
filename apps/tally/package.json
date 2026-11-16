@@ -15,7 +15,7 @@
     "@tailwindcss/postcss": "4.3.5",
     "@tally-local/sdk": "workspace:*",
     "@tally-local/shared": "workspace:*",
-    "better-auth": "1.7.7",
+    "better-auth": "1.7.23",
     "lucide-react": "^1.71.0",
     "next": "16.4.6",
     "react": "19.3.1",
