@@ -1,5 +1,9 @@
 # Tally release readiness
 
+## Version 2.0.1 setup metadata correction
+
+Prepared November 17, 2026. The installed tsup 9.0.0 build prerequisite requires Node 24.11.0 or later in the supported 24.x line. The root engine and current setup instructions now state that minimum; actual local checks used Node 24.22.1 and Docker uses Node 24.19.0. This patch changes only version, engine and documentation metadata. It preserves the 2.0.0 runtime, dependencies, application migrations and SDK schema/API, plus both prior immutable releases. The same complete publisher gates still apply.
+
 ## Version 2.0.0 preparation
 
 Prepared November 17, 2026. This delivery includes the previously unreleased PostgreSQL 18.4 fresh/restore guards and major-version migration guidance. It is a major installation boundary; the coordinated SDK 2.0.0 still uses the same public API and event schema 1. The immutable 1.0.1 source archive remains PostgreSQL 17.

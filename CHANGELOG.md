@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.1
+
+Release preparation dated November 17, 2026.
+
+- Correct the declared installation minimum to Node 24.11.0 within 24.x, matching the existing tsup 9 build prerequisite. Actual verification used supported Node 24.22.1; Docker remains on supported Node 24.19.0. Dependency versions, application/SDK runtime behavior, schema 1 and database migrations are unchanged.
+- Advance coordinated archive/image/package labels and current install references without changing the immutable 2.0.0 release. Setup derives its install filename from the SDK manifest.
+
 ## 2.0.0
 
 Release preparation dated November 17, 2026.

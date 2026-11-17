@@ -4,7 +4,7 @@ Use the root README for a fresh installation. Compose runs PostgreSQL 18.4 with 
 
 ## Configuration
 
-`pnpm run init` generates random database, session and setup secrets in `.env` and copies it to `apps/tally/.env.local`. Node 24 and pnpm 11.19.0 are required. For Compose the database URL is overridden to the internal `db` host; for local Node development it uses loopback port 55487. Never put the authentication secret or setup token in `NEXT_PUBLIC_*`, source control, images, logs or client configuration. The public ingestion UUID is safe to embed and is write-only.
+`pnpm run init` generates random database, session and setup secrets in `.env` and copies it to `apps/tally/.env.local`. Node 24.11.0 or later in 24.x and pnpm 11.19.0 are required. For Compose the database URL is overridden to the internal `db` host; for local Node development it uses loopback port 55487. Never put the authentication secret or setup token in `NEXT_PUBLIC_*`, source control, images, logs or client configuration. The public ingestion UUID is safe to embed and is write-only.
 
 First-owner setup requires the server token and uses a transaction with a singleton installation row, preventing concurrent ownership creation. After setup the token cannot create another owner. Remove `SETUP_TOKEN` from server configuration after successful setup if desired, then restart the app. Owner recovery does not require that token.
 
@@ -100,7 +100,7 @@ The recovery command delegates hashing to Better Auth, changes the existing owne
 3. Obtain the target source, run `pnpm install --frozen-lockfile`, then build the target container.
 4. Run the explicit migration service: `docker compose --profile app run --rm migrate`.
 5. Start the application: `docker compose --profile app up -d app`. Verify readiness, login, project access and known report samples.
-6. Update SDK archives in applications independently. SDK 2.0.0 remains API-compatible and uses schema 1; unsupported event schemas receive permanent 400 responses.
+6. Update SDK archives in applications independently. SDK 2.0.1 remains API-compatible and uses schema 1; unsupported event schemas receive permanent 400 responses.
 
 The initial-to-second migration adds only an index and was tested with existing records. It does not require application code changes and the previous schema-compatible application can read the upgraded database. **No destructive down-migration or general migration rollback is verified.** If a future migration is incompatible, recover a verified backup into a new database and run the matching application revision; later accepted events are absent from that backup. Do not blindly run `migrate reset` or modify an applied migration.
 
