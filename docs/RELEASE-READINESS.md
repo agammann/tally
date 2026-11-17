@@ -1,5 +1,13 @@
 # Tally release readiness
 
+## Version 2.0.0 preparation
+
+Prepared November 17, 2026. This delivery includes the previously unreleased PostgreSQL 18.4 fresh/restore guards and major-version migration guidance. It is a major installation boundary; the coordinated SDK 2.0.0 still uses the same public API and event schema 1. The immutable 1.0.1 source archive remains PostgreSQL 17.
+
+The reference storefront now ends its client and native registration lifetime when release, endpoint, or ingestion identifier changes, and requires explicit reconnect. An actual native callback previously used the edited v2 business behavior with v1 telemetry configuration; the new regression fails on that baseline and verifies withdrawal plus a v2 receipt after reconnect. Setup also derives its archive command from the SDK manifest and labels its receipt timestamp accurately.
+
+Publication requires the complete verification job and the existing PostgreSQL startup-guard, real 17-to-18 dump/restore, and guarded Compose cutover/rollback rehearsals on the exact main commit. Follow the root README and operations guide; do not use fresh initialization on an existing database. Current executed evidence is recorded per run, while historical assessments below retain their original dates and environments.
+
 ## Version 1.0.1 preparation
 
 Prepared November 12, 2026 (November 13 UTC). This source release includes the dependency fixes merged since 1.0.0, the coordinated Prisma 7 migration, and Vite 8.2.6 with patched Rolldown. The application remains Next.js; the Vite advisory concerns exposed development servers. The SDK archive has no runtime dependencies and keeps its public API and event schema 1.

@@ -16,7 +16,28 @@ try{
  await page.getByRole('combobox',{name:'Deterministic scenario'}).selectOption('cancellation');evidence.cancellation=await page.evaluate(async()=>{const m=(document as any).modelContext,tools=await m.getTools(),ac=new AbortController();console.info('TALLY_NATIVE_DIAGNOSTIC '+JSON.stringify({phase:'reference.cancellation',names:tools.map((t:any)=>t.name),requested:'check_delivery',found:tools.some((t:any)=>t.name==='check_delivery')}));const p=m.executeTool(tools.find((t:any)=>t.name==='check_delivery'),{zone:'local'},{signal:ac.signal});setTimeout(()=>ac.abort(),50);try{return {resolved:await p};}catch(e){return {rejected:true,name:e instanceof Error?e.name:'unknown'};}});
  await page.getByRole('button',{name:'Flush telemetry'}).click();await page.getByRole('status').filter({hasText:'Flush finished.'}).waitFor();
  assert.equal((evidence.cancellation as {name:string}).name,'AbortError');
+ const waitDisconnected=async()=>{await page.waitForTimeout(100);assert.deepEqual(await page.evaluate(async()=>(await (document as any).modelContext.getTools()).map((tool:any)=>tool.name)),[],'Changed connection must withdraw all native tools until reconnect');};
+ const connect=async()=>{await page.getByRole('button',{name:'Connect reference project'}).click();await page.getByRole('status').filter({hasText:'Reference project connected.'}).waitFor();await page.waitForFunction(async()=>{const tools=await (document as any).modelContext.getTools();return ['search_products','check_delivery','add_to_cart'].every(name=>tools.some((tool:any)=>tool.name===name));});};
+ await connect();
+ const staleDelivery=await page.evaluateHandle(async()=>(await (document as any).modelContext.getTools()).find((tool:any)=>tool.name==='check_delivery'));
+ await page.getByRole('combobox',{name:'Application release'}).selectOption('v2');await waitDisconnected();
+ assert.equal(await page.getByRole('button',{name:'Test check_delivery'}).isDisabled(),true);
+ const staleRejected=await page.evaluate(async tool=>{try{await (document as any).modelContext.executeTool(tool,{zone:'local'});return false;}catch{return true;}},staleDelivery);await staleDelivery.dispose();assert.equal(staleRejected,true,'A stale native handle must not execute under edited settings');
+ await connect();
+ await page.getByRole('combobox',{name:'Deterministic scenario'}).selectOption('failure');
+ const reconnectedAt=new Date();evidence.reconnected=await run('check_delivery',{zone:'local'});
+ assert.equal((evidence.reconnected as {ok:boolean}).ok,true);
+ await page.getByRole('button',{name:'Flush telemetry'}).click();await page.getByRole('status').filter({hasText:'Flush finished.'}).waitFor();
+ const endpointField=page.getByLabel('Ingestion endpoint'),originalEndpoint=await endpointField.inputValue();
+ await endpointField.fill(originalEndpoint+'?changed=1');await waitDisconnected();await endpointField.fill(originalEndpoint);
+ await connect();
+ const idField=page.getByLabel('Public ingestion identifier');await idField.fill(crypto.randomUUID());await waitDisconnected();await idField.fill(qa.referenceIngestionId!);
+ await connect();
+ evidence.configurationIsolation={releaseDisconnects:true,endpointDisconnects:true,identifierDisconnects:true,staleHandleRejected:staleRejected,reconnectRestoresNative:true};
  const db=createDb();try{
+  const reconnected=await db.event.findMany({where:{projectId:qa.referenceId!,source:'webmcp',kind:'tool_finished',tool:'check_delivery',receivedAt:{gte:reconnectedAt}},select:{release:true,outcome:true}});
+  assert.deepEqual(reconnected,[{release:'v2',outcome:'success'}]);
+  evidence.reconnectedReceipt=reconnected;
   const events=await db.event.findMany({where:{projectId:qa.referenceId!,source:'webmcp',receivedAt:{gte:new Date(evidence.checkedAt as string)}},select:{kind:true,outcome:true,tool:true,source:true}});
   for(const outcome of ['success','failure','cancellation'])assert.ok(events.some(e=>e.kind==='tool_finished'&&e.outcome===outcome),'Persisted native outcome: '+outcome);
   evidence.persisted={events:events.length,terminalOutcomes:events.filter(e=>e.kind==='tool_finished').map(e=>({tool:e.tool,outcome:e.outcome,source:e.source}))};

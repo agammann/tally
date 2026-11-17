@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.0
+
+Release preparation dated November 17, 2026.
+
+- Deliver the previously unreleased PostgreSQL 18.4 installation change as a major operational boundary. Fresh installations require explicit empty-volume initialization and normal startup guards; existing PostgreSQL 17 installations require the documented dump-and-restore cutover and preserve their original volume for rollback.
+- Require Compose 2.24.4 or later up front, route older installations through the major-version procedure before generic application migration, and gate publication on the existing real guard, dump/restore, and Compose rollback rehearsals.
+- Align installation, application, image and SDK archive labels at 2.0.0 through the established coordinated publisher. The SDK API, schema 1 ingestion contract, application migrations, and existing records remain unchanged. Preserve the immutable 1.0.1 release.
+- Correct Setup to display the matching SDK archive version and label its moving receipt timestamp as the last event received.
+- Disconnect the reference client and native tools when its release, endpoint, or ingestion identifier changes. Reject stale native handles until explicit reconnect, preventing new business behavior from being recorded under the old release or project configuration. The real native regression fails on the previous implementation and checks a correctly labeled v2 receipt after reconnect.
+
 ## 1.0.1
 
 Release preparation dated November 12, 2026.
