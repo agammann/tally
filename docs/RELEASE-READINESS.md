@@ -1,5 +1,9 @@
 # Tally release readiness
 
+## Version 2.0.2 dependency update
+
+This release ships the Prisma dependency fix from [#50](https://github.com/agammann/tally/pull/50) in the tagged application source. The lockfile resolves Effect 3.22.1 for [GHSA-7589-6fvf-x4pw](https://github.com/advisories/GHSA-7589-6fvf-x4pw). The [main verification run for the dependency fix](https://github.com/agammann/tally/actions/runs/45554669698) passed the application checks and PostgreSQL rehearsal. The release candidate must also pass the complete publisher gates at its own commit.
+
 ## Version 2.0.1 setup metadata correction
 
 Prepared November 17, 2026. The installed tsup 9.0.0 build prerequisite requires Node 24.11.0 or later in the supported 24.x line. The root engine and current setup instructions now state that minimum; actual local checks used Node 24.22.1 and Docker uses Node 24.19.0. This patch changes only version, engine and documentation metadata. It preserves the 2.0.0 runtime, dependencies, application migrations and SDK schema/API, plus both prior immutable releases. The same complete publisher gates still apply.

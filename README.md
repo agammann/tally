@@ -14,7 +14,7 @@ Tally is a private, self-hosted monitor for explicitly instrumented WebMCP execu
 
 This is a software product, not a contest submission. It runs without a paid service or AI API key. The fictional Field Supply storefront is an integration reference with real telemetry ingestion and simulated orders; it is not the only application the SDK supports.
 
-**Version 2.0.1:** The supported scope is one owner, up to 20 projects, and reports over at most 50,000 retained events per project. Read the [stability and upgrade contract](docs/V1.md) and [executed-check report](docs/RELEASE-READINESS.md). The local npm scope `@tally-local` is provisional; no registry package has been published and availability of the name is not claimed. Tally is licensed under the [MIT License](LICENSE).
+**Version 2.0.2:** The supported scope is one owner, up to 20 projects, and reports over at most 50,000 retained events per project. Read the [stability and upgrade contract](docs/V1.md) and [executed-check report](docs/RELEASE-READINESS.md). The local npm scope `@tally-local` is provisional; no registry package has been published and availability of the name is not claimed. Tally is licensed under the [MIT License](LICENSE).
 
 ![Tally dashboard showing real reference tool observations](docs/assets/dashboard-desktop.png)
 
@@ -22,7 +22,7 @@ This is a software product, not a contest submission. It runs without a paid ser
 
 Requirements: Node.js **24.11.0 or later in 24.x**, **pnpm 11.19.0**, Docker with **Compose 2.24.4 or later**. Ports 3000, 3001 (optional storefront), and 55487 (local PostgreSQL) must be free. These commands work from a checked-out source directory in PowerShell or a POSIX shell.
 
-The PostgreSQL 18 instructions below apply to the [v2.0.1 tagged source](https://github.com/agammann/tally/releases/tag/v2.0.1), which includes `compose.postgres18-init.yaml`. The published [v1.0.1 release](https://github.com/agammann/tally/releases/tag/v1.0.1) contains older PostgreSQL 17 source and does not include that override; if using that release archive, follow the README included in the archive. Version 2.0.1 preserves that older release and makes the PostgreSQL major-version installation boundary explicit. The source contains the application, migrations, SDK, MIT license, and operations documentation; it is not a prebuilt application container.
+The PostgreSQL 18 instructions below apply to the [v2.0.2 tagged source](https://github.com/agammann/tally/releases/tag/v2.0.2), which includes `compose.postgres18-init.yaml`. The published [v1.0.1 release](https://github.com/agammann/tally/releases/tag/v1.0.1) contains older PostgreSQL 17 source and does not include that override; if using that release archive, follow the README included in the archive. Version 2.0.2 preserves that older release and makes the PostgreSQL major-version installation boundary explicit. The source contains the application, migrations, SDK, MIT license, and operations documentation; it is not a prebuilt application container.
 
 For a **new installation only**, first confirm that no previous Tally database exists in another Compose project, external volume, or bind mount. Existing installations must use the [PostgreSQL 17 to 18 migration instructions](docs/OPERATIONS.md#postgresql-17-to-18-migration); do not use the fresh-initialization override for an upgrade.
 
@@ -54,10 +54,10 @@ The initialization command copies local server settings into `apps/tally/.env.lo
 
 ## Install the SDK in another application
 
-Download `tally-local-sdk-2.0.1.tgz` and its `.sha256` file from the [v2.0.1 release](https://github.com/agammann/tally/releases/tag/v2.0.1). Compare the archive's SHA256 against the checksum before installation:
+Download `tally-local-sdk-2.0.2.tgz` and its `.sha256` file from the [v2.0.2 release](https://github.com/agammann/tally/releases/tag/v2.0.2). Compare the archive's SHA256 against the checksum before installation:
 
 ```powershell
-Get-FileHash ./tally-local-sdk-2.0.1.tgz -Algorithm SHA256
+Get-FileHash ./tally-local-sdk-2.0.2.tgz -Algorithm SHA256
 ```
 
 On Linux use `sha256sum`, or on macOS use `shasum -a 256`. You can also build the same distributable format from a checked-out release:
@@ -67,13 +67,13 @@ pnpm --filter @tally-local/sdk build
 pnpm --filter @tally-local/sdk pack --pack-destination artifacts
 ```
 
-Copy the downloaded archive, or `artifacts/tally-local-sdk-2.0.1.tgz` from your source build, to an independent application and run:
+Copy the downloaded archive, or `artifacts/tally-local-sdk-2.0.2.tgz` from your source build, to an independent application and run:
 
 ```sh
-npm install ./tally-local-sdk-2.0.1.tgz
+npm install ./tally-local-sdk-2.0.2.tgz
 ```
 
-The archive contains ESM, CommonJS and TypeScript declarations, with **no runtime dependencies or monorepo imports**. Use the copyable project-specific example in Setup and the [integration guide](docs/INTEGRATION.md). SDK version **2.0.1** sends event schema **1**; the versions are independent. The coordinated 2.0.1 package label follows the installation release; the SDK public API and schema 1 fields remain compatible with 1.x.
+The archive contains ESM, CommonJS and TypeScript declarations, with **no runtime dependencies or monorepo imports**. Use the copyable project-specific example in Setup and the [integration guide](docs/INTEGRATION.md). SDK version **2.0.2** sends event schema **1**; the versions are independent. The coordinated 2.0.2 package label follows the installation release; the SDK public API and schema 1 fields remain compatible with 1.x.
 
 ## Reference storefront
 
