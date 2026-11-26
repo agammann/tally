@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.2
+
+- Ship the Prisma dependency fix from [#50](https://github.com/agammann/tally/pull/50) in the tagged application source. The lockfile now resolves Prisma's transitive Effect dependency to 3.22.1 for [GHSA-7589-6fvf-x4pw](https://github.com/advisories/GHSA-7589-6fvf-x4pw).
+- Update the installation, container and SDK archive labels to 2.0.2. The dependency-free SDK uses event schema 1. Existing PostgreSQL 18 operators can follow the [application upgrade procedure](docs/OPERATIONS.md#upgrade-and-rollback).
+
 ## 2.0.1
 
 Release preparation dated November 17, 2026.
